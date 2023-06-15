@@ -1,0 +1,21 @@
+name: 'Test'
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+      - name: Setup mruby
+        uses: elct9620/setup-mruby@main
+        with:
+          mruby-version: '3.2.0'
+      - run: go test -v ./...
