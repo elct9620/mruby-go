@@ -17,15 +17,33 @@ func Test_Load(t *testing.T) {
 		0x08,
 	})
 
-	expectedHeader := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
-
 	entity, err := rite.Load(buffer)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	expectedHeader := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
 	header := entity.Header().String()
 	if !cmp.Equal(expectedHeader, header) {
 		t.Fatal("RITE header mismatch", cmp.Diff(expectedHeader, header))
+	}
+
+	expectedSectionIdent := []string{
+		"IREP",
+	}
+	expectedSectionSize := len(expectedSectionIdent)
+	sections := entity.Sections()
+	sectionSize := len(sections)
+
+	if !cmp.Equal(expectedSectionSize, sectionSize) {
+		t.Fatal("RITE Section size mismatch", cmp.Diff(expectedSectionSize, sectionSize))
+	}
+
+	for idx, section := range sections {
+		identArray := section.Header().Identity
+		ident := string(identArray[:])
+		if !cmp.Equal(expectedSectionIdent[idx], ident) {
+			t.Fatal("RITE Section Identity mismatch", cmp.Diff(expectedSectionIdent[idx], ident))
+		}
 	}
 }

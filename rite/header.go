@@ -1,6 +1,11 @@
 package rite
 
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
+
+var headerSize = uint32(unsafe.Sizeof(Header{}))
 
 type Version struct {
 	Major [2]byte
