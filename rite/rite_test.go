@@ -28,8 +28,8 @@ func Test_Load(t *testing.T) {
 		t.Fatal("RITE header mismatch", cmp.Diff(expectedHeader, header))
 	}
 
-	expectedSectionIdent := []string{
-		"IREP",
+	expectedSectionIdent := []rite.SectionType{
+		rite.TypeIREP,
 	}
 	expectedSectionSize := len(expectedSectionIdent)
 	sections := entity.Sections()
@@ -40,10 +40,9 @@ func Test_Load(t *testing.T) {
 	}
 
 	for idx, section := range sections {
-		identArray := section.Header().Identity
-		ident := string(identArray[:])
-		if !cmp.Equal(expectedSectionIdent[idx], ident) {
-			t.Fatal("RITE Section Identity mismatch", cmp.Diff(expectedSectionIdent[idx], ident))
+		sectionType := section.Type()
+		if !cmp.Equal(expectedSectionIdent[idx], sectionType) {
+			t.Fatal("RITE Section Identity mismatch", cmp.Diff(expectedSectionIdent[idx], sectionType))
 		}
 	}
 }

@@ -6,7 +6,10 @@ import (
 	"io"
 )
 
-var ErrSectionOverSize = errors.New("section size larger than binary size")
+var (
+	ErrSectionOverSize = errors.New("section size larger than binary size")
+	ErrBinaryEOF       = errors.New("RITE binary is reach end")
+)
 
 var riteOrder = binary.BigEndian
 
@@ -52,16 +55,31 @@ func readSection(r io.Reader, remain uint32) (*Section, error) {
 		return nil, err
 	}
 
-	size := section.Size()
-	if size > remain {
+	isOverSize := section.Size() > remain
+	if isOverSize {
 		return nil, ErrSectionOverSize
 	}
 
-	buffer := make([]byte, size)
-	_, err = r.Read(buffer)
-	if err != nil {
-		return section, nil
+	switch section.Type() {
+	case TypeIREP:
+		noopSection(r, section)
+	case TypeDebug:
+		noopSection(r, section)
+	case TypeLocalVariable:
+		noopSection(r, section)
+	case TypeEOF:
+		return nil, ErrBinaryEOF
 	}
 
 	return section, nil
+}
+
+func noopSection(r io.Reader, section *Section) error {
+	buffer := make([]byte, section.Size())
+	_, err := r.Read(buffer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
