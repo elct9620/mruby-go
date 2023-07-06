@@ -38,4 +38,9 @@ jobs:
         uses: elct9620/setup-mruby@main
         with:
           mruby-version: ${{ matrix.mruby-version }}
-      - run: go test -v ./...
+      - name: Run Test with CodeClimate
+        uses: paambaati/codeclimate-action@v5.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: go test -v -coverprofile coverage.out ./...
