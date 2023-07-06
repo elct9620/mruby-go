@@ -1,38 +1,38 @@
-package rite
+package mruby
 
 import (
 	"fmt"
 	"unsafe"
 )
 
-var headerSize = uint32(unsafe.Sizeof(Header{}))
+var binaryHeaderSize = uint32(unsafe.Sizeof(BinaryHeader{}))
 
-type Version struct {
+type BinaryVersion struct {
 	Major [2]byte
 	Minor [2]byte
 }
 
-func (v Version) String() string {
+func (v BinaryVersion) String() string {
 	return fmt.Sprintf("%s.%s", v.Major, v.Minor)
 }
 
-type Compiler struct {
+type BinaryCompiler struct {
 	Name    [4]byte
 	Version [4]byte
 }
 
-func (c Compiler) String() string {
+func (c BinaryCompiler) String() string {
 	return fmt.Sprintf("%s#%s", c.Name, c.Version)
 }
 
-type Header struct {
+type BinaryHeader struct {
 	Identifier [4]byte
-	Version    Version
+	Version    BinaryVersion
 	Size       uint32
-	Compiler   Compiler
+	Compiler   BinaryCompiler
 }
 
-func (h Header) String() string {
+func (h BinaryHeader) String() string {
 	return fmt.Sprintf(
 		`#<RITE id="%s" version="%s" size="%d" compiler="%s">`,
 		h.Identifier,

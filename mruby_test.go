@@ -1,22 +1,60 @@
 package mruby_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/elct9620/mruby-go"
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_Mrb_Header(t *testing.T) {
-	expected := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
+func Test_Mrb_Load(t *testing.T) {
+	buffer := bytes.NewBuffer([]byte{
+		0x52, 0x49, 0x54, 0x45, 0x30, 0x33, 0x30, 0x30, 0x00, 0x00, 0x00, 0x66, 0x4d, 0x41, 0x54, 0x5a,
+		0x30, 0x30, 0x30, 0x30, 0x49, 0x52, 0x45, 0x50, 0x00, 0x00, 0x00, 0x25, 0x30, 0x33, 0x30, 0x30,
+		0x00, 0x00, 0x00, 0x19, 0x00, 0x01, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
+		0x08, 0x01, 0x38, 0x01, 0x69, 0x00, 0x00, 0x00, 0x00, 0x44, 0x42, 0x47, 0x00, 0x00, 0x00, 0x00,
+		0x25, 0x00, 0x01, 0x00, 0x06, 0x61, 0x64, 0x64, 0x2e, 0x72, 0x62, 0x00, 0x00, 0x00, 0x13, 0x00,
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x03, 0x45, 0x4e,
+		0x44, 0x00, 0x00, 0x00, 0x00, 0x08,
+	})
 
-	mrb, err := mruby.NewFromString("")
+	mrb := mruby.New()
+	err := mrb.Load(buffer)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	riteHeader := mrb.Header().String()
-	if !cmp.Equal(expected, riteHeader) {
-		t.Fatal("RITE header mismatched", cmp.Diff(expected, riteHeader))
+	expectedSectionIdent := []mruby.SectionType{
+		mruby.TypeIREP,
+		mruby.TypeDebug,
+	}
+	expectedSectionSize := len(expectedSectionIdent)
+	sections := mrb.Sections()
+	sectionSize := len(sections)
+
+	if !cmp.Equal(expectedSectionSize, sectionSize) {
+		t.Fatal("RITE Section size mismatch", cmp.Diff(expectedSectionSize, sectionSize))
+	}
+
+	for idx, section := range sections {
+		sectionType := section.Type()
+		if !cmp.Equal(expectedSectionIdent[idx], sectionType) {
+			t.Fatal("RITE Section Identity mismatch", cmp.Diff(expectedSectionIdent[idx], sectionType))
+		}
+	}
+}
+
+func Test_Mrb_LoadString(t *testing.T) {
+	mrb := mruby.New()
+	err := mrb.LoadString("1 + 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
+	header := mrb.Header().String()
+	if !cmp.Equal(expected, header) {
+		t.Fatal("RITE header mismatched", cmp.Diff(expected, header))
 	}
 }

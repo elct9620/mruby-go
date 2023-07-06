@@ -2,30 +2,101 @@ package mruby
 
 import (
 	"bytes"
-
-	"github.com/elct9620/mruby-go/rite"
+	"encoding/binary"
+	"errors"
+	"io"
 )
 
+var (
+	ErrSectionOverSize = errors.New("section size larger than binary size")
+	ErrBinaryEOF       = errors.New("RITE binary is reach end")
+)
+
+var riteOrder = binary.BigEndian
+
 type Mrb struct {
-	rite *rite.RITE
+	header   BinaryHeader
+	sections []*Section
 }
 
-func NewFromString(code string) (*Mrb, error) {
+func New() *Mrb {
+	return &Mrb{}
+}
+
+func (mrb *Mrb) LoadString(code string) error {
 	compiled, err := Compile(bytes.NewBufferString(code))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	rite, err := rite.Load(bytes.NewBuffer(compiled))
+	return mrb.Load(bytes.NewBuffer(compiled))
+}
+
+func (mrb *Mrb) Load(r io.Reader) error {
+	err := binary.Read(r, riteOrder, &mrb.header)
+	if err != nil {
+		return err
+	}
+
+	remain := mrb.Size() - binaryHeaderSize
+	for remain > sectionHeaderSize {
+		section, err := readSection(r, remain)
+		if err != nil {
+			return err
+		}
+
+		mrb.sections = append(mrb.sections, section)
+		remain -= section.Size()
+	}
+
+	return nil
+}
+
+func (mrb *Mrb) Header() BinaryHeader {
+	return mrb.header
+}
+
+func (mrb *Mrb) Sections() []*Section {
+	return mrb.sections
+}
+
+func (mrb *Mrb) Size() uint32 {
+	return mrb.header.Size
+}
+
+func readSection(r io.Reader, remain uint32) (*Section, error) {
+	section := &Section{}
+	err := binary.Read(r, riteOrder, &section.header)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Mrb{
-		rite: rite,
-	}, nil
+	isOverSize := section.Size() > remain
+	if isOverSize {
+		return nil, ErrSectionOverSize
+	}
+
+	switch section.Type() {
+	case TypeIREP:
+		noopSection(r, section)
+	case TypeDebug:
+		noopSection(r, section)
+	case TypeLocalVariable:
+		noopSection(r, section)
+	case TypeEOF:
+		noopSection(r, section)
+		return nil, ErrBinaryEOF
+	}
+
+	return section, nil
 }
 
-func (mrb *Mrb) Header() rite.Header {
-	return mrb.rite.Header()
+func noopSection(r io.Reader, section *Section) error {
+	buffer := make([]byte, section.Size()-sectionHeaderSize)
+	_, err := r.Read(buffer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

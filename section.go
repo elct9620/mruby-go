@@ -1,4 +1,4 @@
-package rite
+package mruby
 
 import "unsafe"
 
