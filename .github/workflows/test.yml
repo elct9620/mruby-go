@@ -44,7 +44,7 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageCommand: go test -v -coverprofile coverage.out ./...
-          prefix: ${{ github.event.repository.name }}
+          prefix: githu.com/${{ github.event.repository.full_name }}
           coverageLocations:
             "${{github.workspace}}/coverage.out:gocov"
 
