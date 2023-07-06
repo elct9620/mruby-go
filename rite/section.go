@@ -29,10 +29,6 @@ type Section struct {
 	header SectionHeader
 }
 
-func (s *Section) Header() SectionHeader {
-	return s.header
-}
-
 func (s *Section) Type() SectionType {
 	if s.header.Identity == [4]byte(IdentIREP) {
 		return TypeIREP

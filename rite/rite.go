@@ -68,6 +68,7 @@ func readSection(r io.Reader, remain uint32) (*Section, error) {
 	case TypeLocalVariable:
 		noopSection(r, section)
 	case TypeEOF:
+		noopSection(r, section)
 		return nil, ErrBinaryEOF
 	}
 
@@ -75,7 +76,7 @@ func readSection(r io.Reader, remain uint32) (*Section, error) {
 }
 
 func noopSection(r io.Reader, section *Section) error {
-	buffer := make([]byte, section.Size())
+	buffer := make([]byte, section.Size()-sectionHeaderSize)
 	_, err := r.Read(buffer)
 	if err != nil {
 		return err
