@@ -12,7 +12,10 @@ func Compile(script io.Reader) ([]byte, error) {
 		return nil, err
 	}
 	defer os.Remove(temp.Name())
-	io.Copy(temp, script)
+	_, err = io.Copy(temp, script)
+	if err != nil {
+		return nil, err
+	}
 
 	cmd := exec.Command(
 		"mrbc",

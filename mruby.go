@@ -78,14 +78,17 @@ func readSection(r io.Reader, remain uint32) (*Section, error) {
 
 	switch section.Type() {
 	case TypeIREP:
-		noopSection(r, section)
+		err = noopSection(r, section)
 	case TypeDebug:
-		noopSection(r, section)
+		err = noopSection(r, section)
 	case TypeLocalVariable:
-		noopSection(r, section)
+		err = noopSection(r, section)
 	case TypeEOF:
-		noopSection(r, section)
 		return nil, ErrBinaryEOF
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return section, nil
