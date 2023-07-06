@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"os"
 
@@ -13,5 +14,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println("Compiled binary: ", bin)
+	reader := bytes.NewBuffer(bin)
+	rite, err := mruby.ReadRiteHeader(reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(rite)
 }

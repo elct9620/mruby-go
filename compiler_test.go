@@ -9,7 +9,6 @@ import (
 )
 
 func Test_Compile(t *testing.T) {
-	sourceCode := bytes.NewBufferString("1 + 1")
 	expected := []byte{
 		0x52, 0x49, 0x54, 0x45, 0x30, 0x33, 0x30, 0x30, 0x00, 0x00, 0x00, 0x41, 0x4d, 0x41, 0x54, 0x5a,
 		0x30, 0x30, 0x30, 0x30, 0x49, 0x52, 0x45, 0x50, 0x00, 0x00, 0x00, 0x25, 0x30, 0x33, 0x30, 0x30,
@@ -18,12 +17,17 @@ func Test_Compile(t *testing.T) {
 		0x08,
 	}
 
-	bin, err := mruby.Compile(sourceCode)
-	if err != nil {
-		t.Fatal("unable to compile ruby", err)
-	}
-
+	bin := mustCompile("1 + 1")
 	if !cmp.Equal(bin, expected) {
 		t.Fatal("compiled binary mismatched", cmp.Diff(expected, bin))
 	}
+}
+
+func mustCompile(code string) []byte {
+	bin, err := mruby.Compile(bytes.NewBufferString(code))
+	if err != nil {
+		panic(err)
+	}
+
+	return bin
 }
