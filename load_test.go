@@ -25,7 +25,7 @@ func Test_Mrb_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `nlocals = 0, nregs = 25, rlen = 1, clen = 4, ilen = 0`
+	expected := `nlocals = 1, nregs = 4, rlen = 0, clen = 0, ilen = 5`
 	if !cmp.Equal(expected, res) {
 		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}
@@ -38,7 +38,7 @@ func Test_Mrb_LoadString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `nlocals = 0, nregs = 25, rlen = 1, clen = 4, ilen = 0`
+	expected := `nlocals = 1, nregs = 4, rlen = 0, clen = 0, ilen = 5`
 	if !cmp.Equal(expected, res) {
 		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}
