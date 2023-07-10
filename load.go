@@ -30,7 +30,7 @@ func (s *State) Load(r io.Reader) (Value, error) {
 		return nil, err
 	}
 
-	return proc.Execute(), nil
+	return proc.Execute(s)
 }
 
 func newProc(r io.Reader) (*Proc, error) {
