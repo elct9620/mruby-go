@@ -14,7 +14,7 @@ var (
 )
 
 // LoadString execute string
-func (s *State) LoadString(code string) (value, error) {
+func (s *state) LoadString(code string) (value, error) {
 	compiled, err := Compile(bytes.NewBufferString(code))
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (s *State) LoadString(code string) (value, error) {
 }
 
 // Load execute RITE binary
-func (s *State) Load(r io.Reader) (value, error) {
+func (s *state) Load(r io.Reader) (value, error) {
 	proc, err := newProc(r)
 	if err != nil {
 		return nil, err
@@ -33,14 +33,14 @@ func (s *State) Load(r io.Reader) (value, error) {
 	return proc.Execute(s)
 }
 
-func newProc(r io.Reader) (*Proc, error) {
+func newProc(r io.Reader) (*proc, error) {
 	var header binaryHeader
 	err := binary.Read(r, riteByteOrder, &header)
 	if err != nil {
 		return nil, err
 	}
 
-	var irep *IREP
+	var executable *irep
 
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
@@ -57,7 +57,7 @@ func newProc(r io.Reader) (*Proc, error) {
 
 		switch header.String() {
 		case sectionTypeIREP:
-			irep, err = readIREP(r, header.Size)
+			executable, err = readIREP(r, header.Size)
 		case sectionTypeDebug:
 			err = noopSection(r, header.Size)
 		case sectionTypeLV:
@@ -73,12 +73,12 @@ func newProc(r io.Reader) (*Proc, error) {
 		remain -= header.Size
 	}
 
-	return &Proc{
-		Executable: irep,
+	return &proc{
+		executable: executable,
 	}, nil
 }
 
-func readIREP(r io.Reader, size uint32) (*IREP, error) {
+func readIREP(r io.Reader, size uint32) (*irep, error) {
 	var riteVersion [4]byte
 	err := binary.Read(r, riteByteOrder, &riteVersion)
 	if err != nil {

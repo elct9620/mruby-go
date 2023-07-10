@@ -6,9 +6,9 @@ import (
 	"io"
 )
 
-var _ Executable = &IREP{}
+var _ executable = &irep{}
 
-type IREP struct {
+type irep struct {
 	NLocals uint16
 	NRegs   uint16
 	RLen    uint16
@@ -16,8 +16,8 @@ type IREP struct {
 	ILen    uint32
 }
 
-func newIREP(r io.Reader) (*IREP, error) {
-	irep := &IREP{}
+func newIREP(r io.Reader) (*irep, error) {
+	irep := &irep{}
 
 	err := binary.Read(r, riteByteOrder, irep)
 	if err != nil {
@@ -27,7 +27,7 @@ func newIREP(r io.Reader) (*IREP, error) {
 	return irep, nil
 }
 
-func (ir *IREP) Execute(state *State) (value, error) {
+func (ir *irep) Execute(state *state) (value, error) {
 	return fmt.Sprintf(
 		"nlocals = %d, nregs = %d, rlen = %d, clen = %d, ilen = %d",
 		ir.NLocals,

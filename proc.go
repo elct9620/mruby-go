@@ -1,9 +1,9 @@
 package mruby
 
-type Executable interface {
-	Execute(state *State) (value, error)
+type executable interface {
+	Execute(state *state) (value, error)
 }
 
-type Proc struct {
-	Executable
+type proc struct {
+	executable
 }

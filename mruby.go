@@ -2,9 +2,9 @@ package mruby
 
 type value = any
 
-type State struct {
+type state struct {
 }
 
-func New() *State {
-	return &State{}
+func New() *state {
+	return &state{}
 }
