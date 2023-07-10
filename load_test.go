@@ -25,8 +25,7 @@ func Test_Mrb_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `#<RITE id="RITE" version="03.00" size="102" compiler="MATZ#0000">`
-
+	expected := `nlocals = 0, nregs = 25, rlen = 1, clen = 4, ilen = 0`
 	if !cmp.Equal(expected, res) {
 		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}
@@ -39,7 +38,7 @@ func Test_Mrb_LoadString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
+	expected := `nlocals = 0, nregs = 25, rlen = 1, clen = 4, ilen = 0`
 	if !cmp.Equal(expected, res) {
 		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}

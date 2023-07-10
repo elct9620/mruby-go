@@ -25,11 +25,22 @@ func (s *State) LoadString(code string) (Value, error) {
 
 // Load execute RITE binary
 func (s *State) Load(r io.Reader) (Value, error) {
+	proc, err := newProc(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return proc.Execute(), nil
+}
+
+func newProc(r io.Reader) (*Proc, error) {
 	var header binaryHeader
 	err := binary.Read(r, riteByteOrder, &header)
 	if err != nil {
 		return nil, err
 	}
+
+	var irep *IREP
 
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
@@ -46,7 +57,10 @@ func (s *State) Load(r io.Reader) (Value, error) {
 
 		switch header.String() {
 		case sectionTypeIREP:
-			noopSection(r, header.Size)
+			irep, err = readIREP(r, header.Size)
+			if err != nil {
+				return nil, err
+			}
 		case sectionTypeDebug:
 			noopSection(r, header.Size)
 		case sectionTypeLV:
@@ -58,7 +72,26 @@ func (s *State) Load(r io.Reader) (Value, error) {
 		remain -= header.Size
 	}
 
-	return header.String(), nil
+	return &Proc{
+		Executable: irep,
+	}, nil
+}
+
+func readIREP(r io.Reader, size uint32) (*IREP, error) {
+	var riteVersion [4]byte
+	err := binary.Read(r, riteByteOrder, &riteVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	irepSize := size - sectionHeaderSize - 4
+	binary := make([]byte, irepSize)
+	_, err = r.Read(binary)
+	if err != nil {
+		return nil, err
+	}
+
+	return newIREP(bytes.NewBuffer(binary))
 }
 
 func noopSection(r io.Reader, size uint32) error {
