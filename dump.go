@@ -49,9 +49,9 @@ type sectionType = string
 
 const (
 	sectionTypeIREP  sectionType = "IREP"
-	sectionTypeDebug             = "DBG\x00"
-	sectionTypeLV                = "LVAR"
-	sectionTypeEOF               = "EOF\x00"
+	sectionTypeDebug sectionType = "DBG\x00"
+	sectionTypeLV    sectionType = "LVAR"
+	sectionTypeEOF   sectionType = "EOF\x00"
 )
 
 type sectionHeader struct {

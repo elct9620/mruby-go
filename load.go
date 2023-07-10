@@ -58,15 +58,16 @@ func newProc(r io.Reader) (*Proc, error) {
 		switch header.String() {
 		case sectionTypeIREP:
 			irep, err = readIREP(r, header.Size)
-			if err != nil {
-				return nil, err
-			}
 		case sectionTypeDebug:
-			noopSection(r, header.Size)
+			err = noopSection(r, header.Size)
 		case sectionTypeLV:
-			noopSection(r, header.Size)
+			err = noopSection(r, header.Size)
 		case sectionTypeEOF:
 			break
+		}
+
+		if err != nil {
+			return nil, err
 		}
 
 		remain -= header.Size
