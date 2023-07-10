@@ -20,41 +20,27 @@ func Test_Mrb_Load(t *testing.T) {
 	})
 
 	mrb := mruby.New()
-	err := mrb.Load(buffer)
+	res, err := mrb.Load(buffer)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expectedSectionIdent := []mruby.SectionType{
-		mruby.TypeIREP,
-		mruby.TypeDebug,
-	}
-	expectedSectionSize := len(expectedSectionIdent)
-	sections := mrb.Sections()
-	sectionSize := len(sections)
+	expected := `#<RITE id="RITE" version="03.00" size="102" compiler="MATZ#0000">`
 
-	if !cmp.Equal(expectedSectionSize, sectionSize) {
-		t.Fatal("RITE Section size mismatch", cmp.Diff(expectedSectionSize, sectionSize))
-	}
-
-	for idx, section := range sections {
-		sectionType := section.Type()
-		if !cmp.Equal(expectedSectionIdent[idx], sectionType) {
-			t.Fatal("RITE Section Identity mismatch", cmp.Diff(expectedSectionIdent[idx], sectionType))
-		}
+	if !cmp.Equal(expected, res) {
+		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}
 }
 
 func Test_Mrb_LoadString(t *testing.T) {
 	mrb := mruby.New()
-	err := mrb.LoadString("1 + 1")
+	res, err := mrb.LoadString("1 + 1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expected := `#<RITE id="RITE" version="03.00" size="65" compiler="MATZ#0000">`
-	header := mrb.Header().String()
-	if !cmp.Equal(expected, header) {
-		t.Fatal("RITE header mismatched", cmp.Diff(expected, header))
+	if !cmp.Equal(expected, res) {
+		t.Fatal("return value mismatch", cmp.Diff(expected, res))
 	}
 }

@@ -16,10 +16,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = mrb.Load(bytes.NewBuffer(compiled))
+	res, err := mrb.Load(bytes.NewBuffer(compiled))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(mrb.Header())
+	log.Println(res.(string))
 }
