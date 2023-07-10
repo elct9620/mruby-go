@@ -7,8 +7,6 @@ import (
 	"io"
 )
 
-var riteByteOrder = binary.BigEndian
-
 var (
 	ErrSectionOverSize = errors.New("section size larger than binary size")
 )
@@ -35,7 +33,7 @@ func (s *state) Load(r io.Reader) (value, error) {
 
 func newProc(r io.Reader) (*proc, error) {
 	var header binaryHeader
-	err := binary.Read(r, riteByteOrder, &header)
+	err := binaryRead(r, &header)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +43,7 @@ func newProc(r io.Reader) (*proc, error) {
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
 		var header sectionHeader
-		err := binary.Read(r, riteByteOrder, &header)
+		err := binaryRead(r, &header)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +78,7 @@ func newProc(r io.Reader) (*proc, error) {
 
 func readIREP(r io.Reader, size uint32) (*irep, error) {
 	var riteVersion [4]byte
-	err := binary.Read(r, riteByteOrder, &riteVersion)
+	err := binaryRead(r, &riteVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -104,4 +102,8 @@ func noopSection(r io.Reader, size uint32) error {
 	}
 
 	return nil
+}
+
+func binaryRead(r io.Reader, data any) error {
+	return binary.Read(r, binary.BigEndian, data)
 }

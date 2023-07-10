@@ -1,7 +1,6 @@
 package mruby
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io"
 )
@@ -45,29 +44,29 @@ func (ir *irep) Execute(state *state) (value, error) {
 }
 
 func irepReadHeader(r io.Reader, ir *irep) (err error) {
-	err = binary.Read(r, riteByteOrder, &ir.nLocals)
+	err = binaryRead(r, &ir.nLocals)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Read(r, riteByteOrder, &ir.nRegs)
+	err = binaryRead(r, &ir.nRegs)
 	if err != nil {
 		return err
 	}
-	err = binary.Read(r, riteByteOrder, &ir.rLen)
+	err = binaryRead(r, &ir.rLen)
 	if err != nil {
 		return err
 	}
-	err = binary.Read(r, riteByteOrder, &ir.cLen)
+	err = binaryRead(r, &ir.cLen)
 	if err != nil {
 		return err
 	}
 
-	return binary.Read(r, riteByteOrder, &ir.iLen)
+	return binaryRead(r, &ir.iLen)
 }
 
 func irepReadISeq(r io.Reader, ir *irep) error {
 	ir.iSeq = make([]code, ir.iLen)
 
-	return binary.Read(r, riteByteOrder, ir.iSeq)
+	return binaryRead(r, ir.iSeq)
 }
