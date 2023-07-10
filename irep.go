@@ -27,7 +27,7 @@ func newIREP(r io.Reader) (*IREP, error) {
 	return irep, nil
 }
 
-func (ir *IREP) Execute(state *State) (Value, error) {
+func (ir *IREP) Execute(state *State) (value, error) {
 	return fmt.Sprintf(
 		"nlocals = %d, nregs = %d, rlen = %d, clen = %d, ilen = %d",
 		ir.NLocals,

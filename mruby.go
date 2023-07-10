@@ -1,6 +1,6 @@
 package mruby
 
-type Value = any
+type value = any
 
 type State struct {
 }
