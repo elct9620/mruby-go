@@ -1,6 +1,9 @@
 package mruby
 
-type value = any
+type (
+	value = any
+	code  = uint8
+)
 
 type state struct {
 }
