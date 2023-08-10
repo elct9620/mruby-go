@@ -42,9 +42,9 @@ func (ir *irep) Execute(state *state) (value, error) {
 		ir.cursor++
 
 		switch opCode {
-		case opLOADI_2:
+		case opLOADI__1, opLOADI_0, opLOADI_1, opLOADI_2, opLOADI_3, opLOADI_4, opLOADI_5, opLOADI_6, opLOADI_7:
 			a = ir.iSeq[ir.cursor]
-			regs[a] = int(opCode - opLOADI_0)
+			regs[a] = int(opCode) - int(opLOADI_0)
 			ir.cursor++
 		case opRETURN:
 			a = ir.iSeq[ir.cursor]
