@@ -55,7 +55,7 @@ func newProc(r io.Reader) (*proc, error) {
 
 		switch header.String() {
 		case sectionTypeIREP:
-			executable, err = readIREP(r, header.Size)
+			executable, err = readIrep(r, header.Size)
 		case sectionTypeDebug:
 			err = noopSection(r, header.Size)
 		case sectionTypeLV:
@@ -76,7 +76,7 @@ func newProc(r io.Reader) (*proc, error) {
 	}, nil
 }
 
-func readIREP(r io.Reader, size uint32) (*irep, error) {
+func readIrep(r io.Reader, size uint32) (*irep, error) {
 	var riteVersion [4]byte
 	err := binaryRead(r, &riteVersion)
 	if err != nil {
