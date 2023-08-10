@@ -16,7 +16,7 @@ type irep struct {
 	iSeq    []code
 }
 
-func newIREP(r io.Reader) (*irep, error) {
+func newIrep(r io.Reader) (*irep, error) {
 	irep := &irep{}
 
 	err := irepReadHeader(r, irep)
