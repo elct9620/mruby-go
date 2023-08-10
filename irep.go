@@ -14,6 +14,7 @@ type irep struct {
 	cLen    uint16
 	iLen    uint32
 	iSeq    []code
+	cursor  int
 }
 
 func newIrep(r io.Reader) (*irep, error) {
@@ -33,14 +34,25 @@ func newIrep(r io.Reader) (*irep, error) {
 }
 
 func (ir *irep) Execute(state *state) (value, error) {
-	return fmt.Sprintf(
-		"nlocals = %d, nregs = %d, rlen = %d, clen = %d, ilen = %d",
-		ir.nLocals,
-		ir.nRegs,
-		ir.rLen,
-		ir.cLen,
-		ir.iLen,
-	), nil
+	var a uint8
+	regs := make([]value, ir.nRegs)
+
+	for {
+		opCode := ir.iSeq[ir.cursor]
+		ir.cursor++
+
+		switch opCode {
+		case opLOADI_2:
+			a = ir.iSeq[ir.cursor]
+			regs[a] = int(opCode - opLOADI_0)
+			ir.cursor++
+		case opRETURN:
+			a = ir.iSeq[ir.cursor]
+			return regs[a], nil
+		default:
+			return nil, fmt.Errorf("opcode %d not implemented", opCode)
+		}
+	}
 }
 
 func irepReadHeader(r io.Reader, ir *irep) (err error) {
