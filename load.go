@@ -54,13 +54,13 @@ func newProc(r io.Reader) (*proc, error) {
 		}
 
 		switch header.String() {
-		case sectionTypeIREP:
+		case sectionTypeIrep:
 			executable, err = readIrep(r, header.Size)
 		case sectionTypeDebug:
 			err = noopSection(r, header.Size)
-		case sectionTypeLV:
+		case sectionTypeLv:
 			err = noopSection(r, header.Size)
-		case sectionTypeEOF:
+		case sectionTypeEof:
 			break
 		}
 
