@@ -1,7 +1,8 @@
 package mruby
 
-type opCode byte
+type opCode byte //nolint:unused
 
+//nolint:unused
 const (
 	opNOP opCode = iota
 	opMOVE
