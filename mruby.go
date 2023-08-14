@@ -1,13 +1,13 @@
 package mruby
 
 type (
-	value = any
+	Value = any
 	code  = uint8
 )
 
-type state struct {
+type State struct {
 }
 
-func New() *state {
-	return &state{}
+func New() *State {
+	return &State{}
 }

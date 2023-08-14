@@ -33,9 +33,9 @@ func newIrep(r io.Reader) (*irep, error) {
 	return irep, nil
 }
 
-func (ir *irep) Execute(state *state) (value, error) {
+func (ir *irep) Execute(state *State) (Value, error) {
 	var a uint8
-	regs := make([]value, ir.nRegs)
+	regs := make([]Value, ir.nRegs)
 
 	for {
 		opCode := ir.iSeq[ir.cursor]

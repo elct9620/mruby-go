@@ -1,7 +1,7 @@
 package mruby
 
 type executable interface {
-	Execute(state *state) (value, error)
+	Execute(state *State) (Value, error)
 }
 
 type proc struct {

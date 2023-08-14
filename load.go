@@ -12,7 +12,7 @@ var (
 )
 
 // LoadString execute string
-func (s *state) LoadString(code string) (value, error) {
+func (s *State) LoadString(code string) (Value, error) {
 	compiled, err := Compile(bytes.NewBufferString(code))
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (s *state) LoadString(code string) (value, error) {
 }
 
 // Load execute RITE binary
-func (s *state) Load(r io.Reader) (value, error) {
+func (s *State) Load(r io.Reader) (Value, error) {
 	proc, err := newProc(r)
 	if err != nil {
 		return nil, err
