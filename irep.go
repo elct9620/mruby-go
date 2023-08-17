@@ -46,6 +46,10 @@ func (ir *irep) Execute(state *State) (Value, error) {
 			a = ir.iSeq[ir.cursor]
 			regs[a] = int(opCode) - int(opLOADI_0)
 			ir.cursor++
+		case opLOADT, opLOADF:
+			a = ir.iSeq[ir.cursor]
+			regs[a] = opCode == opLOADT
+			ir.cursor++
 		case opRETURN:
 			a = ir.iSeq[ir.cursor]
 			return regs[a], nil

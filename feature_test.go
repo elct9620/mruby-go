@@ -33,6 +33,32 @@ func (feat *RubyFeature) thereShouldReturnInteger(expected int) error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnTrue() error {
+	actual, ok := feat.ret.(bool)
+	if !ok {
+		return fmt.Errorf("expected bool, got %T", feat.ret)
+	}
+
+	if !actual {
+		return fmt.Errorf("expected true, got false")
+	}
+
+	return nil
+}
+
+func (feat *RubyFeature) thereShouldReturnFalse() error {
+	actual, ok := feat.ret.(bool)
+	if !ok {
+		return fmt.Errorf("expected bool, got %T", feat.ret)
+	}
+
+	if actual {
+		return fmt.Errorf("expected false, got true")
+	}
+
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	feat := RubyFeature{
 		mrb: mruby.New(),
@@ -40,6 +66,8 @@ func InitializeScenario(s *godog.ScenarioContext) {
 
 	s.Step(`^I execute ruby code:$`, feat.iExecuteRubyCode)
 	s.Step(`^there should return integer (-?\d+)$`, feat.thereShouldReturnInteger)
+	s.Step(`^there should return true$`, feat.thereShouldReturnTrue)
+	s.Step(`^there should return false$`, feat.thereShouldReturnFalse)
 }
 
 func TestFeatures(t *testing.T) {
