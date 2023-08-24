@@ -1,6 +1,7 @@
 package mruby
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 )
@@ -34,7 +35,6 @@ func newIrep(r io.Reader) (*irep, error) {
 }
 
 func (ir *irep) Execute(state *State) (Value, error) {
-	var a uint8
 	regs := make([]Value, ir.nRegs)
 
 	for {
@@ -43,20 +43,44 @@ func (ir *irep) Execute(state *State) (Value, error) {
 
 		switch opCode {
 		case opLOADI__1, opLOADI_0, opLOADI_1, opLOADI_2, opLOADI_3, opLOADI_4, opLOADI_5, opLOADI_6, opLOADI_7:
-			a = ir.iSeq[ir.cursor]
+			a := ir.readB()
 			regs[a] = int(opCode) - int(opLOADI_0)
-			ir.cursor++
 		case opLOADT, opLOADF:
-			a = ir.iSeq[ir.cursor]
+			a := ir.readB()
 			regs[a] = opCode == opLOADT
-			ir.cursor++
+		case opLOADI16:
+			a := ir.readB()
+			b := ir.readS()
+			regs[a] = int(binary.BigEndian.Uint16(b))
+		case opLOADI32:
+			a := ir.readB()
+			b := ir.readW()
+			regs[a] = int(binary.BigEndian.Uint32(b))
 		case opRETURN:
-			a = ir.iSeq[ir.cursor]
+			a := ir.readB()
 			return regs[a], nil
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
 	}
+}
+
+func (ir *irep) readB() byte {
+	b := ir.iSeq[ir.cursor]
+	ir.cursor++
+	return b
+}
+
+func (ir *irep) readS() []byte {
+	s := ir.iSeq[ir.cursor : ir.cursor+2]
+	ir.cursor += 2
+	return s
+}
+
+func (ir *irep) readW() []byte {
+	w := ir.iSeq[ir.cursor : ir.cursor+4]
+	ir.cursor += 4
+	return w
 }
 
 func irepReadHeader(r io.Reader, ir *irep) (err error) {
