@@ -36,3 +36,16 @@ Feature: Math
       | a       | operator | b | result  |
       | 1000000 | -        | 1 | 999999  |
       | 1000000 | +        | 1 | 1000001 |
+  Scenario: Load integer directly
+    When I execute ruby code:
+      """
+      <int>
+      """
+    Then there should return integer <result>
+    Examples:
+      | int  | result |
+      | 1    | 1      |
+      | 128  | 128    |
+      | -128 | -128   |
+      | -256 | -256   |
+

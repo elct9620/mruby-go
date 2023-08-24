@@ -42,6 +42,14 @@ func (ir *irep) Execute(state *State) (Value, error) {
 		ir.cursor++
 
 		switch opCode {
+		case opLOADI:
+			a := ir.readB()
+			b := ir.readB()
+			regs[a] = int(b)
+		case opLOADINEG:
+			a := ir.readB()
+			b := ir.readB()
+			regs[a] = -int(b)
 		case opLOADI__1, opLOADI_0, opLOADI_1, opLOADI_2, opLOADI_3, opLOADI_4, opLOADI_5, opLOADI_6, opLOADI_7:
 			a := ir.readB()
 			regs[a] = int(opCode) - int(opLOADI_0)
@@ -51,11 +59,11 @@ func (ir *irep) Execute(state *State) (Value, error) {
 		case opLOADI16:
 			a := ir.readB()
 			b := ir.readS()
-			regs[a] = int(binary.BigEndian.Uint16(b))
+			regs[a] = int(int16(binary.BigEndian.Uint16(b)))
 		case opLOADI32:
 			a := ir.readB()
 			b := ir.readW()
-			regs[a] = int(binary.BigEndian.Uint32(b))
+			regs[a] = int(int32(binary.BigEndian.Uint32(b)))
 		case opRETURN:
 			a := ir.readB()
 			return regs[a], nil
