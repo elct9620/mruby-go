@@ -6,6 +6,7 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/elct9620/mruby-go"
+	"github.com/google/go-cmp/cmp"
 )
 
 const SuiteSuccessCode = 0
@@ -59,6 +60,19 @@ func (feat *RubyFeature) thereShouldReturnFalse() error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnString(expected string) error {
+	actual, ok := feat.ret.(string)
+	if !ok {
+		return fmt.Errorf("expected string, got %T", feat.ret)
+	}
+
+	if !cmp.Equal(actual, expected) {
+		return fmt.Errorf("string not matched %s", cmp.Diff(actual, expected))
+	}
+
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	feat := RubyFeature{
 		mrb: mruby.New(),
@@ -68,6 +82,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return integer (-?\d+)$`, feat.thereShouldReturnInteger)
 	s.Step(`^there should return true$`, feat.thereShouldReturnTrue)
 	s.Step(`^there should return false$`, feat.thereShouldReturnFalse)
+	s.Step(`^there should return string "([^"]*)"$`, feat.thereShouldReturnString)
 }
 
 func TestFeatures(t *testing.T) {
