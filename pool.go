@@ -2,15 +2,14 @@ package mruby
 
 import (
 	"errors"
-	"io"
 )
 
 var ErrUnsupportPoolValueType = errors.New("unsupport pool value type")
 
-type PoolType uint8
+type poolType uint8
 
 const (
-	poolTypeString PoolType = iota
+	poolTypeString poolType = iota
 	poolTypeInt32
 	poolTypeStaticString
 	poolTypeInt64
@@ -18,24 +17,23 @@ const (
 	poolTypeBigInt = 7
 )
 
-type PoolReader = func(io.Reader) (Value, error)
+type PoolReader = func(*Reader) (Value, error)
 
-var poolReaders = map[PoolType]PoolReader{
+var poolReaders = map[poolType]PoolReader{
 	poolTypeString: poolReadString,
 }
 
-func readPoolValues(ir *irep, r io.Reader) error {
-	var pLen uint16
-	err := binaryRead(r, &pLen)
+func readPoolValues(ir *irep, r *Reader) error {
+	pLen, err := r.ReadUint16()
 	if err != nil {
 		return err
 	}
 
 	ir.poolValue = make([]Value, pLen)
 
-	var pType PoolType
+	var pType poolType
 	for i := 0; i < int(pLen); i++ {
-		err = binaryRead(r, &pType)
+		err = r.ReadAs(&pType)
 		if err != nil {
 			return err
 		}
@@ -56,18 +54,11 @@ func readPoolValues(ir *irep, r io.Reader) error {
 	return nil
 }
 
-func poolReadString(r io.Reader) (Value, error) {
-	var sLen uint16
-	err := binaryRead(r, &sLen)
+func poolReadString(r *Reader) (Value, error) {
+	sLen, err := r.ReadUint16()
 	if err != nil {
 		return "", err
 	}
 
-	s := make([]byte, sLen+1)
-	err = binaryRead(r, s)
-	if err != nil {
-		return "", err
-	}
-
-	return string(s[0:sLen]), nil
+	return r.ReadString(int(sLen + 1))
 }
