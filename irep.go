@@ -23,12 +23,12 @@ type irep struct {
 func newIrep(r io.Reader) (*irep, error) {
 	irep := &irep{}
 
-	err := irepReadHeader(r, irep)
+	err := irepReadHeader(irep, r)
 	if err != nil {
 		return nil, err
 	}
 
-	err = irepReadISeq(r, irep)
+	err = irepReadISeq(irep, r)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (ir *irep) readW() []byte {
 	return w
 }
 
-func irepReadHeader(r io.Reader, ir *irep) (err error) {
+func irepReadHeader(ir *irep, r io.Reader) (err error) {
 	err = binaryRead(r, &ir.nLocals)
 	if err != nil {
 		return err
@@ -125,7 +125,7 @@ func irepReadHeader(r io.Reader, ir *irep) (err error) {
 	return binaryRead(r, &ir.iLen)
 }
 
-func irepReadISeq(r io.Reader, ir *irep) error {
+func irepReadISeq(ir *irep, r io.Reader) error {
 	ir.iSeq = make([]code, ir.iLen)
 
 	return binaryRead(r, ir.iSeq)
