@@ -33,7 +33,7 @@ func newIrep(r io.Reader) (*irep, error) {
 		return nil, err
 	}
 
-	err = irepReadPool(r, irep)
+	err = readPoolValues(irep, r)
 	if err != nil {
 		return nil, err
 	}
@@ -129,46 +129,4 @@ func irepReadISeq(r io.Reader, ir *irep) error {
 	ir.iSeq = make([]code, ir.iLen)
 
 	return binaryRead(r, ir.iSeq)
-}
-
-func irepReadPool(r io.Reader, ir *irep) error {
-	var pLen uint16
-	err := binaryRead(r, &pLen)
-	if err != nil {
-		return err
-	}
-
-	var pType uint8
-	for i := 0; i < int(pLen); i++ {
-		err = binaryRead(r, &pType)
-		if err != nil {
-			return err
-		}
-
-		switch pType {
-		case poolTypeString:
-			var sLen uint16
-			err = binaryRead(r, &sLen)
-			if err != nil {
-				return err
-			}
-
-			s := make([]byte, sLen+1)
-			err = binaryRead(r, s)
-			if err != nil {
-				return err
-			}
-
-			ir.poolValue = append(ir.poolValue, string(s[0:sLen]))
-		case poolTypeInt32:
-		case poolTypeStaticString:
-		case poolTypeInt64:
-		case poolTypeFloat:
-		case poolTypeBigInt:
-		}
-
-		ir.pLen = uint16(i + 1)
-	}
-
-	return nil
 }
