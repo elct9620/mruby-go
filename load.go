@@ -46,7 +46,7 @@ func readIrep(r io.Reader, size uint32) (*irep, error) {
 	}
 
 	sizeStripped := binary[4:]
-	return newIrep(bytes.NewBuffer(sizeStripped))
+	return newIrep(NewBytesReader(sizeStripped))
 }
 
 func noopSection(r io.Reader, size uint32) error {

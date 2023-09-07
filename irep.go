@@ -3,7 +3,6 @@ package mruby
 import (
 	"encoding/binary"
 	"fmt"
-	"io"
 )
 
 var _ executable = &irep{}
@@ -20,7 +19,7 @@ type irep struct {
 	cursor    int
 }
 
-func newIrep(r io.Reader) (*irep, error) {
+func newIrep(r *Reader) (*irep, error) {
 	irep := &irep{}
 
 	err := irepReadHeader(irep, r)
@@ -103,30 +102,30 @@ func (ir *irep) readW() []byte {
 	return w
 }
 
-func irepReadHeader(ir *irep, r io.Reader) (err error) {
-	err = binaryRead(r, &ir.nLocals)
+func irepReadHeader(ir *irep, r *Reader) (err error) {
+	err = r.ReadAs(&ir.nLocals)
 	if err != nil {
 		return err
 	}
 
-	err = binaryRead(r, &ir.nRegs)
+	err = r.ReadAs(&ir.nRegs)
 	if err != nil {
 		return err
 	}
-	err = binaryRead(r, &ir.rLen)
+	err = r.ReadAs(&ir.rLen)
 	if err != nil {
 		return err
 	}
-	err = binaryRead(r, &ir.cLen)
+	err = r.ReadAs(&ir.cLen)
 	if err != nil {
 		return err
 	}
 
-	return binaryRead(r, &ir.iLen)
+	return r.ReadAs(&ir.iLen)
 }
 
-func irepReadISeq(ir *irep, r io.Reader) error {
+func irepReadISeq(ir *irep, r *Reader) error {
 	ir.iSeq = make([]code, ir.iLen)
 
-	return binaryRead(r, ir.iSeq)
+	return r.ReadAs(ir.iSeq)
 }
