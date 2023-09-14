@@ -32,7 +32,7 @@ func readPoolValues(ir *irep, r *Reader) error {
 	ir.poolValue = make([]Value, pLen)
 
 	var pType poolType
-	for i := 0; i < int(pLen); i++ {
+	for i := uint16(0); i < pLen; i++ {
 		err = r.ReadAs(&pType)
 		if err != nil {
 			return err

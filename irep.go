@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const nullSymbolLength = 0xffff
+
 var _ executable = &irep{}
 
 type irep struct {
@@ -14,8 +16,10 @@ type irep struct {
 	cLen      uint16
 	iLen      uint32
 	pLen      uint16
+	sLen      uint16
 	iSeq      *instructionSequence
 	poolValue []Value
+	syms      []string
 }
 
 func newIrep(r *Reader) (*irep, error) {
@@ -32,6 +36,11 @@ func newIrep(r *Reader) (*irep, error) {
 	}
 
 	err = readPoolValues(irep, r)
+	if err != nil {
+		return nil, err
+	}
+
+	err = readSyms(irep, r)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +77,10 @@ func (ir *irep) Execute(state *State) (Value, error) {
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadW()
 			regs[a] = int(int32(binary.BigEndian.Uint32(b)))
+		case opLOADSYM:
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
+			regs[a] = ir.syms[b]
 		case opSTRING:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
@@ -112,5 +125,35 @@ func irepReadISeq(ir *irep, r *Reader) error {
 	}
 
 	ir.iSeq = newInstructionSequence(binary)
+	return nil
+}
+
+func readSyms(ir *irep, r *Reader) error {
+	err := r.ReadAs(&ir.sLen)
+	if err != nil {
+		return err
+	}
+
+	ir.syms = make([]string, ir.sLen)
+
+	for i := uint16(0); i < ir.sLen; i++ {
+		strLen, err := r.ReadUint16()
+		if err != nil {
+			return err
+		}
+
+		if strLen == nullSymbolLength {
+			continue
+		}
+
+		str := make([]byte, strLen)
+		err = r.ReadAs(str)
+		if err != nil {
+			return err
+		}
+
+		ir.syms[i] = string(str)
+	}
+
 	return nil
 }
