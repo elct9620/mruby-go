@@ -1,5 +1,7 @@
 package mruby
 
+type code = uint8
+
 //nolint:unused
 const (
 	opNOP code = iota

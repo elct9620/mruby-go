@@ -14,9 +14,8 @@ type irep struct {
 	cLen      uint16
 	iLen      uint32
 	pLen      uint16
-	iSeq      []code
+	iSeq      *instructionSequence
 	poolValue []Value
-	cursor    int
 }
 
 func newIrep(r *Reader) (*irep, error) {
@@ -44,62 +43,43 @@ func (ir *irep) Execute(state *State) (Value, error) {
 	regs := make([]Value, ir.nRegs)
 
 	for {
-		opCode := ir.iSeq[ir.cursor]
-		ir.cursor++
+		opCode := ir.iSeq.ReadCode()
 
 		switch opCode {
 		case opLOADI:
-			a := ir.readB()
-			b := ir.readB()
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
 			regs[a] = int(b)
 		case opLOADINEG:
-			a := ir.readB()
-			b := ir.readB()
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
 			regs[a] = -int(b)
 		case opLOADI__1, opLOADI_0, opLOADI_1, opLOADI_2, opLOADI_3, opLOADI_4, opLOADI_5, opLOADI_6, opLOADI_7:
-			a := ir.readB()
+			a := ir.iSeq.ReadB()
 			regs[a] = int(opCode) - int(opLOADI_0)
 		case opLOADT, opLOADF:
-			a := ir.readB()
+			a := ir.iSeq.ReadB()
 			regs[a] = opCode == opLOADT
 		case opLOADI16:
-			a := ir.readB()
-			b := ir.readS()
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadS()
 			regs[a] = int(int16(binary.BigEndian.Uint16(b)))
 		case opLOADI32:
-			a := ir.readB()
-			b := ir.readW()
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadW()
 			regs[a] = int(int32(binary.BigEndian.Uint32(b)))
 		case opSTRING:
-			a := ir.readB()
-			b := ir.readB()
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
 
 			regs[a] = ir.poolValue[b]
 		case opRETURN:
-			a := ir.readB()
+			a := ir.iSeq.ReadB()
 			return regs[a], nil
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
 	}
-}
-
-func (ir *irep) readB() byte {
-	b := ir.iSeq[ir.cursor]
-	ir.cursor++
-	return b
-}
-
-func (ir *irep) readS() []byte {
-	s := ir.iSeq[ir.cursor : ir.cursor+2]
-	ir.cursor += 2
-	return s
-}
-
-func (ir *irep) readW() []byte {
-	w := ir.iSeq[ir.cursor : ir.cursor+4]
-	ir.cursor += 4
-	return w
 }
 
 func irepReadHeader(ir *irep, r *Reader) (err error) {
@@ -125,7 +105,12 @@ func irepReadHeader(ir *irep, r *Reader) (err error) {
 }
 
 func irepReadISeq(ir *irep, r *Reader) error {
-	ir.iSeq = make([]code, ir.iLen)
+	binary := make([]byte, ir.iLen)
+	err := r.ReadAs(binary)
+	if err != nil {
+		return err
+	}
 
-	return r.ReadAs(ir.iSeq)
+	ir.iSeq = newInstructionSequence(binary)
+	return nil
 }
