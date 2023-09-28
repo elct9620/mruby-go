@@ -55,6 +55,8 @@ func (ir *irep) Execute(state *State) (Value, error) {
 		opCode := ir.iSeq.ReadCode()
 
 		switch opCode {
+		case opMove:
+			regs[ir.iSeq.ReadB()] = regs[ir.iSeq.ReadB()]
 		case opLoadI:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
@@ -89,6 +91,9 @@ func (ir *irep) Execute(state *State) (Value, error) {
 		case opReturn:
 			a := ir.iSeq.ReadB()
 			return regs[a], nil
+		case opStrCat:
+			a := ir.iSeq.ReadB()
+			regs[a] = fmt.Sprintf("%v%v", regs[a], regs[a+1])
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
