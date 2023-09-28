@@ -55,38 +55,38 @@ func (ir *irep) Execute(state *State) (Value, error) {
 		opCode := ir.iSeq.ReadCode()
 
 		switch opCode {
-		case opLOADI:
+		case opLoadI:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[a] = int(b)
-		case opLOADINEG:
+		case opLoadINeg:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[a] = -int(b)
-		case opLOADI__1, opLOADI_0, opLOADI_1, opLOADI_2, opLOADI_3, opLOADI_4, opLOADI_5, opLOADI_6, opLOADI_7:
+		case opLoadI__1, opLoadI_0, opLoadI_1, opLoadI_2, opLoadI_3, opLoadI_4, opLoadI_5, opLoadI_6, opLoadI_7:
 			a := ir.iSeq.ReadB()
-			regs[a] = int(opCode) - int(opLOADI_0)
-		case opLOADT, opLOADF:
+			regs[a] = int(opCode) - int(opLoadI_0)
+		case opLoadT, opLoadF:
 			a := ir.iSeq.ReadB()
-			regs[a] = opCode == opLOADT
-		case opLOADI16:
+			regs[a] = opCode == opLoadT
+		case opLoadI16:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadS()
 			regs[a] = int(int16(binary.BigEndian.Uint16(b)))
-		case opLOADI32:
+		case opLoadI32:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadW()
 			regs[a] = int(int32(binary.BigEndian.Uint32(b)))
-		case opLOADSYM:
+		case opLoadSym:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[a] = ir.syms[b]
-		case opSTRING:
+		case opString:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 
 			regs[a] = ir.poolValue[b]
-		case opRETURN:
+		case opReturn:
 			a := ir.iSeq.ReadB()
 			return regs[a], nil
 		default:
