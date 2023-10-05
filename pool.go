@@ -31,19 +31,8 @@ func readPoolValues(ir *iRep, r *Reader) error {
 
 	ir.poolValue = make([]Value, pLen)
 
-	var pType poolType
 	for i := uint16(0); i < pLen; i++ {
-		err = r.ReadAs(&pType)
-		if err != nil {
-			return err
-		}
-
-		reader := poolReaders[pType]
-		if reader == nil {
-			return ErrUnsupportPoolValueType
-		}
-
-		ir.poolValue[i], err = reader(r)
+		ir.poolValue[i], err = readPoolValue(r)
 		if err != nil {
 			return err
 		}
@@ -52,6 +41,21 @@ func readPoolValues(ir *iRep, r *Reader) error {
 	}
 
 	return nil
+}
+
+func readPoolValue(r *Reader) (Value, error) {
+	var pType poolType
+	err := r.ReadAs(&pType)
+	if err != nil {
+		return nil, err
+	}
+
+	reader := poolReaders[pType]
+	if reader == nil {
+		return nil, ErrUnsupportPoolValueType
+	}
+
+	return reader(r)
 }
 
 func poolReadString(r *Reader) (Value, error) {
