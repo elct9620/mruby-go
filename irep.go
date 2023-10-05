@@ -12,7 +12,7 @@ var _ executable = &iRep{}
 type iRepReaderFn func(*iRep, *Reader) error
 
 var iRepReaders = []iRepReaderFn{
-	readiRepHeader,
+	readIRepHeader,
 	readISeq,
 	readPoolValues,
 	readSyms,
@@ -96,26 +96,23 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 	}
 }
 
-func readiRepHeader(ir *iRep, r *Reader) (err error) {
-	err = r.ReadAs(&ir.nLocals)
-	if err != nil {
-		return err
+func readIRepHeader(ir *iRep, r *Reader) (err error) {
+	fields := []any{
+		&ir.nLocals,
+		&ir.nRegs,
+		&ir.rLen,
+		&ir.cLen,
+		&ir.iLen,
 	}
 
-	err = r.ReadAs(&ir.nRegs)
-	if err != nil {
-		return err
-	}
-	err = r.ReadAs(&ir.rLen)
-	if err != nil {
-		return err
-	}
-	err = r.ReadAs(&ir.cLen)
-	if err != nil {
-		return err
+	for _, field := range fields {
+		err = r.ReadAs(field)
+		if err != nil {
+			return err
+		}
 	}
 
-	return r.ReadAs(&ir.iLen)
+	return nil
 }
 
 func readISeq(ir *iRep, r *Reader) error {
