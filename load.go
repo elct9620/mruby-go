@@ -31,7 +31,7 @@ func (s *State) Load(r io.Reader) (Value, error) {
 	return proc.Execute(s)
 }
 
-func readIrep(r io.Reader, size uint32) (*irep, error) {
+func readIRep(r io.Reader, size uint32) (*iRep, error) {
 	var riteVersion [4]byte
 	err := binaryRead(r, &riteVersion)
 	if err != nil {
@@ -46,7 +46,7 @@ func readIrep(r io.Reader, size uint32) (*irep, error) {
 	}
 
 	sizeStripped := binary[4:]
-	return newIrep(NewBytesReader(sizeStripped))
+	return newIRep(NewBytesReader(sizeStripped))
 }
 
 func noopSection(r io.Reader, size uint32) error {

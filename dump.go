@@ -48,7 +48,7 @@ func (h binaryHeader) String() string {
 type sectionType = string
 
 const (
-	sectionTypeIrep  sectionType = "IREP"
+	sectionTypeIRep  sectionType = "IREP"
 	sectionTypeDebug sectionType = "DBG\x00"
 	sectionTypeLv    sectionType = "LVAR"
 	sectionTypeEof   sectionType = "EOF\x00"

@@ -7,9 +7,18 @@ import (
 
 const nullSymbolLength = 0xffff
 
-var _ executable = &irep{}
+var _ executable = &iRep{}
 
-type irep struct {
+type iRepReaderFn func(*iRep, *Reader) error
+
+var iRepReaders = []iRepReaderFn{
+	readiRepHeader,
+	readISeq,
+	readPoolValues,
+	readSyms,
+}
+
+type iRep struct {
 	nLocals   uint16
 	nRegs     uint16
 	rLen      uint16
@@ -22,33 +31,20 @@ type irep struct {
 	syms      []string
 }
 
-func newIrep(r *Reader) (*irep, error) {
-	irep := &irep{}
+func newIRep(r *Reader) (*iRep, error) {
+	iRep := &iRep{}
 
-	err := irepReadHeader(irep, r)
-	if err != nil {
-		return nil, err
+	for _, loader := range iRepReaders {
+		err := loader(iRep, r)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	err = irepReadISeq(irep, r)
-	if err != nil {
-		return nil, err
-	}
-
-	err = readPoolValues(irep, r)
-	if err != nil {
-		return nil, err
-	}
-
-	err = readSyms(irep, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return irep, nil
+	return iRep, nil
 }
 
-func (ir *irep) Execute(state *State) (Value, error) {
+func (ir *iRep) Execute(state *State) (Value, error) {
 	regs := make([]Value, ir.nRegs)
 
 	for {
@@ -100,7 +96,7 @@ func (ir *irep) Execute(state *State) (Value, error) {
 	}
 }
 
-func irepReadHeader(ir *irep, r *Reader) (err error) {
+func readiRepHeader(ir *iRep, r *Reader) (err error) {
 	err = r.ReadAs(&ir.nLocals)
 	if err != nil {
 		return err
@@ -122,7 +118,7 @@ func irepReadHeader(ir *irep, r *Reader) (err error) {
 	return r.ReadAs(&ir.iLen)
 }
 
-func irepReadISeq(ir *irep, r *Reader) error {
+func readISeq(ir *iRep, r *Reader) error {
 	binary := make([]byte, ir.iLen)
 	err := r.ReadAs(binary)
 	if err != nil {
@@ -133,7 +129,7 @@ func irepReadISeq(ir *irep, r *Reader) error {
 	return nil
 }
 
-func readSyms(ir *irep, r *Reader) error {
+func readSyms(ir *iRep, r *Reader) error {
 	err := r.ReadAs(&ir.sLen)
 	if err != nil {
 		return err

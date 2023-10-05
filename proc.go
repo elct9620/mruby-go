@@ -17,7 +17,7 @@ func newProc(r io.Reader) (*proc, error) {
 		return nil, err
 	}
 
-	var executable *irep
+	var executable *iRep
 
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
@@ -33,8 +33,8 @@ func newProc(r io.Reader) (*proc, error) {
 		}
 
 		switch header.String() {
-		case sectionTypeIrep:
-			executable, err = readIrep(r, header.Size)
+		case sectionTypeIRep:
+			executable, err = readIRep(r, header.Size)
 		case sectionTypeDebug:
 			err = noopSection(r, header.Size)
 		case sectionTypeLv:
