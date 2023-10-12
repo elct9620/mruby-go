@@ -49,8 +49,8 @@ const (
 	opExpect
 	opRescue
 	opRaiseIf
-	opSSend
-	opSSendB
+	opSelfSend
+	opSelfSendB
 	opSend
 	opSendB
 	opCall

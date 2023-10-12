@@ -79,6 +79,20 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[a] = ir.syms[b]
+		case opSelfSend:
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
+			c := ir.iSeq.ReadB()
+
+			funcName := ir.syms[b]
+			if funcName == "puts" {
+				argc := c & 0xf
+				fmt.Println(regs[a+1 : a+argc+1]...)
+				regs[a] = regs[a+1]
+				break
+			}
+
+			regs[a] = nil
 		case opString:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
