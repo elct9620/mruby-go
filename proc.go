@@ -21,16 +21,7 @@ func newProc(r io.Reader) (*proc, error) {
 
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
-		var header sectionHeader
-		err := binaryRead(r, &header)
-		if err != nil {
-			return nil, err
-		}
-
-		isOverSize := header.Size > remain
-		if isOverSize {
-			return nil, ErrSectionOverSize
-		}
+		header, err := readSectionHeader(r, remain)
 
 		switch header.String() {
 		case sectionTypeIRep:
@@ -53,4 +44,19 @@ func newProc(r io.Reader) (*proc, error) {
 	return &proc{
 		executable: executable,
 	}, nil
+}
+
+func readSectionHeader(r io.Reader, remain uint32) (*sectionHeader, error) {
+	var header sectionHeader
+	err := binaryRead(r, &header)
+	if err != nil {
+		return nil, err
+	}
+
+	isOverSize := header.Size > remain
+	if isOverSize {
+		return nil, ErrSectionOverSize
+	}
+
+	return &header, nil
 }
