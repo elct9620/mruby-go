@@ -84,11 +84,14 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			b := ir.iSeq.ReadB()
 			c := ir.iSeq.ReadB()
 
-			funcName := ir.syms[b]
-			if funcName == "puts" {
+			recv := regs[0]
+			mid := ir.syms[b]
+			method := findMethod(state, recv, mid)
+
+			if method != nil {
 				argc := c & 0xf
-				fmt.Println(regs[a+1 : a+argc+1]...)
-				regs[a] = regs[a+1]
+				args := regs[a+1 : a+argc+1]
+				regs[a] = method.Function(state, args)
 				break
 			}
 
