@@ -11,30 +11,30 @@ type Method struct {
 	Function
 }
 
-type Callinfo struct {
-	NumArgs  int
-	MethodId Symbol
-	Stack    []Value
+type callinfo struct {
+	numArgs  int
+	methodId Symbol
+	stack    []Value
 }
 
-type Context struct {
-	Callinfo *Callinfo
+type context struct {
+	callinfo *callinfo
 }
 
 type State struct {
-	Context *Context
+	context *context
 }
 
 func New() *State {
 	return &State{
-		Context: &Context{},
+		context: &context{},
 	}
 }
 
 func (s *State) GetArgc() int {
-	return s.Context.Callinfo.NumArgs
+	return s.context.callinfo.numArgs
 }
 
 func (s *State) GetArgv() []Value {
-	return s.Context.Callinfo.Stack[1:]
+	return s.context.callinfo.stack[1:]
 }
