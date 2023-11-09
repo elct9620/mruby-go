@@ -18,7 +18,12 @@ type callinfo struct {
 }
 
 type context struct {
-	callinfo *callinfo
+	ciCursor  int
+	callinfos []*callinfo
+}
+
+func (ctx *context) GetCallinfo() *callinfo {
+	return ctx.callinfos[len(ctx.callinfos)-1]
 }
 
 type State struct {
@@ -27,14 +32,17 @@ type State struct {
 
 func New() *State {
 	return &State{
-		context: &context{},
+		context: &context{
+			ciCursor:  -1,
+			callinfos: []*callinfo{},
+		},
 	}
 }
 
 func (s *State) GetArgc() int {
-	return s.context.callinfo.numArgs
+	return s.context.GetCallinfo().numArgs
 }
 
 func (s *State) GetArgv() []Value {
-	return s.context.callinfo.stack[1:]
+	return s.context.GetCallinfo().stack[1:]
 }

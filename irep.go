@@ -84,24 +84,20 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			b := ir.iSeq.ReadB()
 			c := ir.iSeq.ReadB()
 
-			ci := &callinfo{
-				numArgs:  int(c & 0xf),
-				methodId: ir.syms[b],
-				stack:    []Value{nil},
-			}
-
+			ci := state.PushCallinfo(ir.syms[b], c)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
-			state.context.callinfo = ci
 
 			recv := regs[0]
 			method := findMethod(state, recv, ci.methodId)
 
 			if method == nil {
 				regs[a] = nil
+				state.PopCallinfo()
 				break
 			}
 
 			regs[a] = method.Function(state, recv)
+			state.PopCallinfo()
 		case opString:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
