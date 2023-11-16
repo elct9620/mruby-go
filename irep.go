@@ -85,7 +85,6 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			c := ir.iSeq.ReadB()
 
 			regs[a] = regs[0]
-			opCode = opSend
 
 			ci := state.PushCallinfo(ir.syms[b], c, nil)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
