@@ -12,6 +12,14 @@ var methods = map[string]*Method{
 	},
 }
 
+type RClass struct {
+}
+
+func (mrb *State) ClassOf(v Value) *RClass {
+	// NOTE: Null Pointer fallback to FalseClass
+	return mrb.falseClass
+}
+
 func (mrb *State) FindMethod(recv Value, mid string) *Method {
 	if m, ok := methods[mid]; ok {
 		return m

@@ -1,12 +1,13 @@
 package mruby
 
-func (state *State) PushCallinfo(mid string, argc byte) *callinfo {
+func (state *State) PushCallinfo(mid string, argc byte, targetClass *RClass) *callinfo {
 	ctx := state.context
 
 	callinfo := &callinfo{
-		methodId: mid,
-		numArgs:  int(argc & 0xf),
-		stack:    []Value{nil},
+		methodId:    mid,
+		numArgs:     int(argc & 0xf),
+		stack:       []Value{nil},
+		targetClass: targetClass,
 	}
 
 	ctx.ciCursor++

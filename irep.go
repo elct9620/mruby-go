@@ -84,10 +84,14 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			b := ir.iSeq.ReadB()
 			c := ir.iSeq.ReadB()
 
-			ci := state.PushCallinfo(ir.syms[b], c)
+			regs[a] = regs[0]
+			opCode = opSend
+
+			ci := state.PushCallinfo(ir.syms[b], c, nil)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
 
 			recv := regs[0]
+			ci.targetClass = state.ClassOf(recv)
 			method := state.FindMethod(recv, ci.methodId)
 
 			if method == nil {

@@ -12,9 +12,10 @@ type Method struct {
 }
 
 type callinfo struct {
-	numArgs  int
-	methodId Symbol
-	stack    []Value
+	numArgs     int
+	methodId    Symbol
+	stack       []Value
+	targetClass *RClass
 }
 
 type context struct {
@@ -28,6 +29,8 @@ func (ctx *context) GetCallinfo() *callinfo {
 
 type State struct {
 	context *context
+
+	falseClass *RClass
 }
 
 func New() *State {
@@ -36,6 +39,7 @@ func New() *State {
 			ciCursor:  -1,
 			callinfos: []*callinfo{},
 		},
+		falseClass: &RClass{},
 	}
 }
 
