@@ -12,7 +12,7 @@ var methods = map[string]*Method{
 	},
 }
 
-func findMethod(mrb *State, recv Value, mid string) *Method {
+func (mrb *State) FindMethod(recv Value, mid string) *Method {
 	if m, ok := methods[mid]; ok {
 		return m
 	}

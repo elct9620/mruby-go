@@ -88,7 +88,7 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
 
 			recv := regs[0]
-			method := findMethod(state, recv, ci.methodId)
+			method := state.FindMethod(recv, ci.methodId)
 
 			if method == nil {
 				regs[a] = nil
