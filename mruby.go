@@ -18,15 +18,6 @@ type callinfo struct {
 	targetClass *RClass
 }
 
-type context struct {
-	ciCursor  int
-	callinfos []*callinfo
-}
-
-func (ctx *context) GetCallinfo() *callinfo {
-	return ctx.callinfos[len(ctx.callinfos)-1]
-}
-
 type State struct {
 	context *context
 
