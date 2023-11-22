@@ -9,20 +9,12 @@ func (state *State) PushCallinfo(mid string, argc byte, targetClass *RClass) *ca
 		stack:       []Value{nil},
 		targetClass: targetClass,
 	}
-
-	ctx.ciCursor++
-
-	if ctx.ciCursor >= len(state.context.callinfos) {
-		ctx.callinfos = append(state.context.callinfos, callinfo)
-	} else {
-		ctx.callinfos[ctx.ciCursor] = callinfo
-	}
+	ctx.callinfo.Push(callinfo)
 
 	return callinfo
 }
 
 func (state *State) PopCallinfo() {
 	ctx := state.context
-	ctx.callinfos[ctx.ciCursor] = nil
-	ctx.ciCursor--
+	ctx.callinfo.Pop()
 }

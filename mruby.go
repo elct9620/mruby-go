@@ -1,5 +1,7 @@
 package mruby
 
+import "github.com/elct9620/mruby-go/stack"
+
 type (
 	Value  = any
 	Symbol = string
@@ -27,8 +29,7 @@ type State struct {
 func New() *State {
 	return &State{
 		context: &context{
-			ciCursor:  -1,
-			callinfos: []*callinfo{},
+			callinfo: stack.New[*callinfo](),
 		},
 		falseClass: &RClass{},
 	}

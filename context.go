@@ -1,10 +1,11 @@
 package mruby
 
+import "github.com/elct9620/mruby-go/stack"
+
 type context struct {
-	ciCursor  int
-	callinfos []*callinfo
+	callinfo *stack.Stack[*callinfo]
 }
 
 func (ctx *context) GetCallinfo() *callinfo {
-	return ctx.callinfos[len(ctx.callinfos)-1]
+	return ctx.callinfo.Peek()
 }
