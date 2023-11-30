@@ -24,6 +24,8 @@ type State struct {
 	context *context
 
 	falseClass *RClass
+
+	topSelf *RObject
 }
 
 func New() *State {
@@ -32,6 +34,7 @@ func New() *State {
 			callinfo: stack.New[*callinfo](),
 		},
 		falseClass: &RClass{},
+		topSelf:    &RObject{},
 	}
 }
 

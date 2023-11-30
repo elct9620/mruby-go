@@ -13,6 +13,7 @@ var methods = map[string]*Method{
 }
 
 type RClass struct {
+	super *RClass
 }
 
 func (mrb *State) ClassOf(v Value) *RClass {
