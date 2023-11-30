@@ -28,6 +28,15 @@ func (s *State) Load(r io.Reader) (Value, error) {
 		return nil, err
 	}
 
+	if s.context.stack == nil {
+		s.context.stack = make([]Value, StackInitSize)
+		s.context.stackBase = 0
+		s.context.stackEnd = StackInitSize - 1
+	}
+
+	s.context.stack[0] = s.topSelf
+	s.context.callinfo.Push(&callinfo{})
+
 	return proc.Execute(s)
 }
 

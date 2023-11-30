@@ -45,73 +45,75 @@ func newIRep(r *Reader) (*iRep, error) {
 }
 
 func (ir *iRep) Execute(state *State) (Value, error) {
-	regs := make([]Value, ir.nRegs)
+	ci := state.context.GetCallinfo()
+	offset := ci.stackOffset
+	regs := state.context.stack
 
 	for {
 		opCode := ir.iSeq.ReadCode()
 
 		switch opCode {
 		case opMove:
-			regs[ir.iSeq.ReadB()] = regs[ir.iSeq.ReadB()]
+			regs[offset+int(ir.iSeq.ReadB())] = regs[offset+int(ir.iSeq.ReadB())]
 		case opLoadI:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
-			regs[a] = int(b)
+			regs[offset+int(a)] = int(b)
 		case opLoadINeg:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
-			regs[a] = -int(b)
+			regs[offset+int(a)] = -int(b)
 		case opLoadI__1, opLoadI_0, opLoadI_1, opLoadI_2, opLoadI_3, opLoadI_4, opLoadI_5, opLoadI_6, opLoadI_7:
 			a := ir.iSeq.ReadB()
-			regs[a] = int(opCode) - int(opLoadI_0)
+			regs[offset+int(a)] = int(opCode) - int(opLoadI_0)
 		case opLoadT, opLoadF:
 			a := ir.iSeq.ReadB()
-			regs[a] = opCode == opLoadT
+			regs[offset+int(a)] = opCode == opLoadT
 		case opLoadI16:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadS()
-			regs[a] = int(int16(binary.BigEndian.Uint16(b)))
+			regs[offset+int(a)] = int(int16(binary.BigEndian.Uint16(b)))
 		case opLoadI32:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadW()
-			regs[a] = int(int32(binary.BigEndian.Uint32(b)))
+			regs[offset+int(a)] = int(int32(binary.BigEndian.Uint32(b)))
 		case opLoadSym:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
-			regs[a] = ir.syms[b]
+			regs[offset+int(a)] = ir.syms[b]
 		case opSelfSend:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			c := ir.iSeq.ReadB()
 
-			regs[a] = regs[0]
+			regs[offset+int(a)] = regs[offset]
 
-			ci := state.PushCallinfo(ir.syms[b], c, nil)
+			ci := state.PushCallinfo(ir.syms[b], int(a), c, nil)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
 
-			recv := regs[0]
+			recv := regs[offset]
 			ci.targetClass = state.ClassOf(recv)
 			method := state.FindMethod(recv, ci.methodId)
 
 			if method == nil {
-				regs[a] = nil
+				regs[offset+int(a)] = nil
 				state.PopCallinfo()
 				break
 			}
 
-			regs[a] = method.Function(state, recv)
+			regs[offset+int(a)] = method.Function(state, recv)
 			state.PopCallinfo()
 		case opString:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 
-			regs[a] = ir.poolValue[b]
+			regs[offset+int(a)] = ir.poolValue[b]
 		case opReturn:
 			a := ir.iSeq.ReadB()
-			return regs[a], nil
+			return regs[offset+int(a)], nil
 		case opStrCat:
 			a := ir.iSeq.ReadB()
-			regs[a] = fmt.Sprintf("%v%v", regs[a], regs[a+1])
+			regs[offset+int(a)] = fmt.Sprintf("%v%v", regs[offset+int(a)], regs[offset+int(a)+1])
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
