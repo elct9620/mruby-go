@@ -93,7 +93,7 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 
 			recv := regs[offset]
 			ci.targetClass = state.ClassOf(recv)
-			method := state.FindMethod(recv, ci.methodId)
+			method := state.FindMethod(recv, ci.targetClass, ci.methodId)
 
 			if method == nil {
 				regs[offset+int(a)] = nil
