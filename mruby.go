@@ -1,8 +1,6 @@
 package mruby
 
 import (
-	"fmt"
-
 	"github.com/elct9620/mruby-go/stack"
 )
 
@@ -29,6 +27,7 @@ type State struct {
 	context *context
 
 	falseClass  *RClass
+	trueClass   *RClass
 	objectClass *RClass
 
 	topSelf *RObject
@@ -39,7 +38,6 @@ func New() *State {
 		context: &context{
 			callinfo: stack.New[*callinfo](),
 		},
-		falseClass:  NewClass(),
 		objectClass: NewClass(),
 		topSelf:     &RObject{},
 	}
@@ -62,11 +60,5 @@ func (s *State) GetArgv() []Value {
 }
 
 func initCore(mrb *State) {
-	mrb.objectClass.DefineMethod("puts", &Method{
-		Function: func(mrb *State, recv Value) Value {
-			args := mrb.GetArgv()
-			fmt.Println(args...)
-			return args[0]
-		},
-	})
+	initObject(mrb)
 }

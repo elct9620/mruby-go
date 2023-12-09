@@ -27,6 +27,8 @@ func (mrb *State) ClassOf(v Value) *RClass {
 		if v == false {
 			return mrb.falseClass
 		}
+
+		return mrb.trueClass
 	}
 
 	return nil
