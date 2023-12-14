@@ -2,6 +2,7 @@ package mruby
 
 type MethodTable map[string]*Method
 type RClass struct {
+	RBasic
 	super *RClass
 	mt    MethodTable
 }
@@ -55,6 +56,15 @@ func (mrb *State) FindMethod(recv Value, class *RClass, mid string) *Method {
 }
 
 func initClass(mrb *State) {
-	mrb.basicObject = newClass(mrb, nil)
-	mrb.objectClass = newClass(mrb, mrb.basicObject)
+	basicObject := newClass(mrb, nil)
+	objectClass := newClass(mrb, basicObject)
+	mrb.objectClass = objectClass
+	moduleClass := newClass(mrb, mrb.objectClass)
+	mrb.moduleClass = moduleClass
+	classClass := newClass(mrb, mrb.moduleClass)
+	mrb.classClass = classClass
+
+	basicObject.class = classClass
+	objectClass.class = classClass
+	moduleClass.class = classClass
 }

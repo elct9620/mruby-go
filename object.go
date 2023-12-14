@@ -3,6 +3,7 @@ package mruby
 import "fmt"
 
 type RBasic struct {
+	class *RClass
 }
 
 type RObject struct {
