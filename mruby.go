@@ -26,6 +26,7 @@ type callinfo struct {
 type State struct {
 	context *context
 
+	basicObject *RClass
 	falseClass  *RClass
 	trueClass   *RClass
 	objectClass *RClass
@@ -38,8 +39,7 @@ func New() *State {
 		context: &context{
 			callinfo: stack.New[*callinfo](),
 		},
-		objectClass: NewClass(),
-		topSelf:     &RObject{},
+		topSelf: &RObject{},
 	}
 
 	initCore(state)
@@ -57,8 +57,4 @@ func (s *State) GetArgv() []Value {
 	end := begin + ci.numArgs
 
 	return s.context.stack[begin:end]
-}
-
-func initCore(mrb *State) {
-	initObject(mrb)
 }

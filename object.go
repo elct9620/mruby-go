@@ -10,8 +10,8 @@ type RObject struct {
 }
 
 func initObject(mrb *State) {
-	mrb.falseClass = NewClass()
-	mrb.trueClass = NewClass()
+	mrb.falseClass = mrb.NewClass(mrb.objectClass)
+	mrb.trueClass = mrb.NewClass(mrb.objectClass)
 
 	mrb.objectClass.DefineMethod("puts", &Method{
 		Function: func(mrb *State, recv Value) Value {

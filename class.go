@@ -2,13 +2,24 @@ package mruby
 
 type MethodTable map[string]*Method
 type RClass struct {
-	mt MethodTable
+	super *RClass
+	mt    MethodTable
 }
 
-func NewClass() *RClass {
-	return &RClass{
+func (mrb *State) NewClass(super *RClass) *RClass {
+	return newClass(mrb, super)
+}
+
+func newClass(mrb *State, super *RClass) *RClass {
+	class := &RClass{
 		mt: make(MethodTable),
 	}
+
+	if super != nil {
+		class.super = super
+	}
+
+	return class
 }
 
 func (c *RClass) DefineMethod(name string, m *Method) {
@@ -41,4 +52,9 @@ func (mrb *State) FindMethod(recv Value, class *RClass, mid string) *Method {
 	}
 
 	return nil
+}
+
+func initClass(mrb *State) {
+	mrb.basicObject = newClass(mrb, nil)
+	mrb.objectClass = newClass(mrb, mrb.basicObject)
 }
