@@ -12,7 +12,14 @@ func (mrb *State) NewClass(super *RClass) *RClass {
 }
 
 func (mrb *State) DefineModule(name string) *RClass {
-	return newClass(mrb, mrb.ModuleClass)
+	return newModule(mrb)
+}
+
+func newModule(mrb *State) *RClass {
+	return &RClass{
+		super: mrb.ModuleClass,
+		mt:    make(MethodTable),
+	}
 }
 
 func newClass(mrb *State, super *RClass) *RClass {
