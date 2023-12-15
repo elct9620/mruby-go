@@ -34,13 +34,13 @@ func (c *RClass) LookupMethod(name string) *Method {
 func (mrb *State) ClassOf(v Value) *RClass {
 	switch v.(type) {
 	case *RObject:
-		return mrb.objectClass
+		return mrb.ObjectClass
 	case bool:
 		if v == false {
-			return mrb.falseClass
+			return mrb.FalseClass
 		}
 
-		return mrb.trueClass
+		return mrb.TrueClass
 	}
 
 	return nil
@@ -58,11 +58,11 @@ func (mrb *State) FindMethod(recv Value, class *RClass, mid string) *Method {
 func initClass(mrb *State) {
 	basicObject := newClass(mrb, nil)
 	objectClass := newClass(mrb, basicObject)
-	mrb.objectClass = objectClass
-	moduleClass := newClass(mrb, mrb.objectClass)
-	mrb.moduleClass = moduleClass
-	classClass := newClass(mrb, mrb.moduleClass)
-	mrb.classClass = classClass
+	mrb.ObjectClass = objectClass
+	moduleClass := newClass(mrb, mrb.ObjectClass)
+	mrb.ModuleClass = moduleClass
+	classClass := newClass(mrb, mrb.ModuleClass)
+	mrb.ClassClass = classClass
 
 	basicObject.class = classClass
 	objectClass.class = classClass
