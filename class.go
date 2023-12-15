@@ -11,6 +11,10 @@ func (mrb *State) NewClass(super *RClass) *RClass {
 	return newClass(mrb, super)
 }
 
+func (mrb *State) DefineModule(name string) *RClass {
+	return newClass(mrb, mrb.ModuleClass)
+}
+
 func newClass(mrb *State, super *RClass) *RClass {
 	class := &RClass{
 		mt: make(MethodTable),

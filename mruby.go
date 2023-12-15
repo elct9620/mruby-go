@@ -26,11 +26,12 @@ type callinfo struct {
 type State struct {
 	context *context
 
-	ObjectClass *RClass
-	ModuleClass *RClass
-	ClassClass  *RClass
-	FalseClass  *RClass
-	TrueClass   *RClass
+	ObjectClass  *RClass
+	ModuleClass  *RClass
+	ClassClass   *RClass
+	FalseClass   *RClass
+	TrueClass    *RClass
+	KernelModule *RClass
 
 	topSelf *RObject
 }
