@@ -9,7 +9,7 @@ const nullSymbolLength = 0xffff
 
 var _ executable = &iRep{}
 
-type iRepReaderFn func(*iRep, *Reader) error
+type iRepReaderFn func(*State, *iRep, *Reader) error
 
 var iRepReaders = []iRepReaderFn{
 	readIRepHeader,
@@ -28,14 +28,14 @@ type iRep struct {
 	sLen      uint16
 	iSeq      *instructionSequence
 	poolValue []Value
-	syms      []string
+	syms      []Symbol
 }
 
-func newIRep(r *Reader) (*iRep, error) {
+func newIRep(mrb *State, r *Reader) (*iRep, error) {
 	iRep := &iRep{}
 
 	for _, loader := range iRepReaders {
-		err := loader(iRep, r)
+		err := loader(mrb, iRep, r)
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +120,7 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 	}
 }
 
-func readIRepHeader(ir *iRep, r *Reader) (err error) {
+func readIRepHeader(mrb *State, ir *iRep, r *Reader) (err error) {
 	fields := []any{
 		&ir.nLocals,
 		&ir.nRegs,
@@ -139,7 +139,7 @@ func readIRepHeader(ir *iRep, r *Reader) (err error) {
 	return nil
 }
 
-func readISeq(ir *iRep, r *Reader) error {
+func readISeq(mrb *State, ir *iRep, r *Reader) error {
 	binary := make([]byte, ir.iLen)
 	err := r.ReadAs(binary)
 	if err != nil {
@@ -150,13 +150,13 @@ func readISeq(ir *iRep, r *Reader) error {
 	return nil
 }
 
-func readSyms(ir *iRep, r *Reader) error {
+func readSyms(mrb *State, ir *iRep, r *Reader) error {
 	err := r.ReadAs(&ir.sLen)
 	if err != nil {
 		return err
 	}
 
-	ir.syms = make([]string, ir.sLen)
+	ir.syms = make([]Symbol, ir.sLen)
 
 	for i := uint16(0); i < ir.sLen; i++ {
 		strLen, err := r.ReadUint16()
@@ -174,7 +174,7 @@ func readSyms(ir *iRep, r *Reader) error {
 			return err
 		}
 
-		ir.syms[i] = string(str)
+		ir.syms[i] = mrb.Intern(string(str))
 	}
 
 	return nil

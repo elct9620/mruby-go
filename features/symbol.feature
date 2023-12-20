@@ -4,4 +4,4 @@ Feature: Symbol
       """
       :ruby
       """
-    Then there should return string "ruby"
+    Then there should return symbol "ruby"

@@ -14,7 +14,7 @@ func initObject(mrb *State) {
 	mrb.FalseClass = mrb.NewClass(mrb.ObjectClass)
 	mrb.TrueClass = mrb.NewClass(mrb.ObjectClass)
 
-	mrb.ObjectClass.DefineMethod("puts", &Method{
+	mrb.ObjectClass.DefineMethod(mrb, "puts", &Method{
 		Function: func(mrb *State, recv Value) Value {
 			args := mrb.GetArgv()
 			fmt.Println(args...)

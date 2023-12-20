@@ -1,6 +1,6 @@
 package mruby
 
-type MethodTable map[string]*Method
+type MethodTable map[Symbol]*Method
 type RClass struct {
 	RBasic
 	super *RClass
@@ -34,12 +34,13 @@ func newClass(mrb *State, super *RClass) *RClass {
 	return class
 }
 
-func (c *RClass) DefineMethod(name string, m *Method) {
-	c.mt[name] = m
+func (c *RClass) DefineMethod(mrb *State, name string, m *Method) {
+	mid := mrb.Intern(name)
+	c.mt[mid] = m
 }
 
-func (c *RClass) LookupMethod(name string) *Method {
-	return c.mt[name]
+func (c *RClass) LookupMethod(mid Symbol) *Method {
+	return c.mt[mid]
 }
 
 func (mrb *State) ClassOf(v Value) *RClass {
@@ -57,7 +58,7 @@ func (mrb *State) ClassOf(v Value) *RClass {
 	return nil
 }
 
-func (mrb *State) FindMethod(recv Value, class *RClass, mid string) *Method {
+func (mrb *State) FindMethod(recv Value, class *RClass, mid Symbol) *Method {
 	m := class.LookupMethod(mid)
 	if m != nil {
 		return m

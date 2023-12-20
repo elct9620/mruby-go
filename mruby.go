@@ -5,8 +5,7 @@ import (
 )
 
 type (
-	Value  = any
-	Symbol = string
+	Value = any
 )
 
 type Function func(*State, Value) Value
@@ -34,6 +33,9 @@ type State struct {
 	KernelModule *RClass
 
 	topSelf *RObject
+
+	symbolTable map[string]Symbol
+	symbolIndex int
 }
 
 func New() *State {
@@ -41,7 +43,9 @@ func New() *State {
 		context: &context{
 			callinfo: stack.New[*callinfo](),
 		},
-		topSelf: &RObject{},
+		topSelf:     &RObject{},
+		symbolTable: make(map[string]Symbol),
+		symbolIndex: 0,
 	}
 
 	initCore(state)

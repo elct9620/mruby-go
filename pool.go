@@ -23,7 +23,7 @@ var poolReaders = map[poolType]PoolReader{
 	poolTypeString: poolReadString,
 }
 
-func readPoolValues(ir *iRep, r *Reader) error {
+func readPoolValues(mrb *State, ir *iRep, r *Reader) error {
 	pLen, err := r.ReadUint16()
 	if err != nil {
 		return err

@@ -1,6 +1,6 @@
 package mruby
 
-func (state *State) PushCallinfo(mid string, pushStack int, argc byte, targetClass *RClass) *callinfo {
+func (state *State) PushCallinfo(mid Symbol, pushStack int, argc byte, targetClass *RClass) *callinfo {
 	ctx := state.context
 	prevCi := ctx.GetCallinfo()
 

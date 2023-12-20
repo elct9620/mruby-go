@@ -73,6 +73,20 @@ func (feat *RubyFeature) thereShouldReturnString(expected string) error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnSymbol(expected string) error {
+	ret, ok := feat.ret.(mruby.Symbol)
+	if !ok {
+		return fmt.Errorf("expected symbol, got %T", feat.ret)
+	}
+
+	actual := feat.mrb.SymbolName(ret)
+	if actual != expected {
+		return fmt.Errorf("expected %s, got %s", expected, actual)
+	}
+
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	feat := RubyFeature{
 		mrb: mruby.New(),
@@ -83,6 +97,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return true$`, feat.thereShouldReturnTrue)
 	s.Step(`^there should return false$`, feat.thereShouldReturnFalse)
 	s.Step(`^there should return string "([^"]*)"$`, feat.thereShouldReturnString)
+	s.Step(`^there should return symbol "([^"]*)"$`, feat.thereShouldReturnSymbol)
 }
 
 func TestFeatures(t *testing.T) {

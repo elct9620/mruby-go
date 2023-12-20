@@ -10,7 +10,7 @@ type proc struct {
 	executable
 }
 
-func newProc(r io.Reader) (*proc, error) {
+func newProc(mrb *State, r io.Reader) (*proc, error) {
 	var header binaryHeader
 	err := binaryRead(r, &header)
 	if err != nil {
@@ -25,7 +25,7 @@ func newProc(r io.Reader) (*proc, error) {
 
 		switch header.String() {
 		case sectionTypeIRep:
-			executable, err = readIRep(r, header.Size)
+			executable, err = readIRep(mrb, r, header.Size)
 		case sectionTypeDebug:
 			err = noopSection(r, header.Size)
 		case sectionTypeLv:

@@ -23,7 +23,7 @@ func (s *State) LoadString(code string) (Value, error) {
 
 // Load execute RITE binary
 func (s *State) Load(r io.Reader) (Value, error) {
-	proc, err := newProc(r)
+	proc, err := newProc(s, r)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *State) Load(r io.Reader) (Value, error) {
 	return proc.Execute(s)
 }
 
-func readIRep(r io.Reader, size uint32) (*iRep, error) {
+func readIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
 	var riteVersion [4]byte
 	err := binaryRead(r, &riteVersion)
 	if err != nil {
@@ -55,7 +55,7 @@ func readIRep(r io.Reader, size uint32) (*iRep, error) {
 	}
 
 	sizeStripped := binary[4:]
-	return newIRep(NewBytesReader(sizeStripped))
+	return newIRep(mrb, NewBytesReader(sizeStripped))
 }
 
 func noopSection(r io.Reader, size uint32) error {
