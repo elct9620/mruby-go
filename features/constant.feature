@@ -5,3 +5,11 @@ Feature: Constant
       MY_CONSTANT
       """
     Then there should return nil
+
+  Scenario: I can get existing constant
+    When I execute ruby code:
+      """
+      MY_CONSTANT = 1
+      MY_CONSTANT
+      """
+    Then there should return integer 1

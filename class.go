@@ -1,10 +1,13 @@
 package mruby
 
-type MethodTable map[Symbol]*Method
+type methodTable map[Symbol]*Method
+type mt = methodTable
+
 type RClass struct {
 	RBasic
 	super *RClass
-	mt    MethodTable
+	mt
+	iv
 }
 
 func (mrb *State) NewClass(super *RClass) *RClass {
@@ -18,13 +21,15 @@ func (mrb *State) DefineModule(name string) *RClass {
 func newModule(mrb *State) *RClass {
 	return &RClass{
 		super: mrb.ModuleClass,
-		mt:    make(MethodTable),
+		mt:    make(methodTable),
+		iv:    make(ivTable),
 	}
 }
 
 func newClass(mrb *State, super *RClass) *RClass {
 	class := &RClass{
-		mt: make(MethodTable),
+		mt: make(methodTable),
+		iv: make(ivTable),
 	}
 
 	if super != nil {
