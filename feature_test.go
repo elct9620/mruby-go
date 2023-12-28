@@ -60,6 +60,14 @@ func (feat *RubyFeature) thereShouldReturnFalse() error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnNil() error {
+	if feat.ret != nil {
+		return fmt.Errorf("expected nil, got %T", feat.ret)
+	}
+
+	return nil
+}
+
 func (feat *RubyFeature) thereShouldReturnString(expected string) error {
 	actual, ok := feat.ret.(string)
 	if !ok {
@@ -96,6 +104,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return integer (-?\d+)$`, feat.thereShouldReturnInteger)
 	s.Step(`^there should return true$`, feat.thereShouldReturnTrue)
 	s.Step(`^there should return false$`, feat.thereShouldReturnFalse)
+	s.Step(`^there should return nil$`, feat.thereShouldReturnNil)
 	s.Step(`^there should return string "([^"]*)"$`, feat.thereShouldReturnString)
 	s.Step(`^there should return symbol "([^"]*)"$`, feat.thereShouldReturnSymbol)
 }

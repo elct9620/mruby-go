@@ -81,6 +81,10 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[offset+int(a)] = ir.syms[b]
+		case opGetConst:
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
+			regs[a] = state.GetConst(ir.syms[b])
 		case opSelfSend:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
