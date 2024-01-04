@@ -3,8 +3,10 @@ package mruby
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
+var _ RBasic = &RClass{}
+
 type RClass struct {
-	RBasic
+	object
 	super *RClass
 	mt
 	iv
@@ -84,4 +86,9 @@ func initClass(mrb *State) {
 	basicObject.class = classClass
 	objectClass.class = classClass
 	moduleClass.class = classClass
+
+	mrb.DefineConstById(basicObject, mrb.Intern("BasicObject"), NewObjectValue(basicObject))
+	mrb.DefineConstById(objectClass, mrb.Intern("Object"), NewObjectValue(objectClass))
+	mrb.DefineConstById(objectClass, mrb.Intern("Module"), NewObjectValue(moduleClass))
+	mrb.DefineConstById(objectClass, mrb.Intern("Class"), NewObjectValue(classClass))
 }

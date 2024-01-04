@@ -2,12 +2,22 @@ package mruby
 
 import "fmt"
 
-type RBasic struct {
+type object struct {
 	class *RClass
 }
 
+type RBasic interface {
+	Class() *RClass
+}
+
+var _ RBasic = &RObject{}
+
 type RObject struct {
-	RBasic
+	object
+}
+
+func (obj *object) Class() *RClass {
+	return nil
 }
 
 func initObject(mrb *State) {
