@@ -44,10 +44,10 @@ func newIRep(mrb *State, r *Reader) (*iRep, error) {
 	return iRep, nil
 }
 
-func (ir *iRep) Execute(state *State) (Value, error) {
-	ci := state.context.GetCallinfo()
+func (ir *iRep) Execute(mrb *State) (Value, error) {
+	ci := mrb.context.GetCallinfo()
 	offset := ci.stackOffset
-	regs := state.context.stack
+	regs := mrb.context.stack
 
 	for {
 		opCode := ir.iSeq.ReadCode()
@@ -84,11 +84,11 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 		case opGetConst:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
-			regs[a] = state.GetConst(ir.syms[b])
+			regs[a] = mrb.VmGetConst(ir.syms[b])
 		case opSetConst:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
-			state.SetConst(ir.syms[b], regs[a])
+			mrb.VmSetConst(ir.syms[b], regs[a])
 		case opSelfSend:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
@@ -96,21 +96,21 @@ func (ir *iRep) Execute(state *State) (Value, error) {
 
 			regs[offset+int(a)] = regs[offset]
 
-			ci := state.PushCallinfo(ir.syms[b], int(a), c, nil)
+			ci := mrb.PushCallinfo(ir.syms[b], int(a), c, nil)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
 
 			recv := regs[offset]
-			ci.targetClass = state.ClassOf(recv)
-			method := state.FindMethod(recv, ci.targetClass, ci.methodId)
+			ci.targetClass = mrb.ClassOf(recv)
+			method := mrb.FindMethod(recv, ci.targetClass, ci.methodId)
 
 			if method == nil {
 				regs[offset+int(a)] = nil
-				state.PopCallinfo()
+				mrb.PopCallinfo()
 				break
 			}
 
-			regs[offset+int(a)] = method.Function(state, recv)
-			state.PopCallinfo()
+			regs[offset+int(a)] = method.Function(mrb, recv)
+			mrb.PopCallinfo()
 		case opString:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
