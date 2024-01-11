@@ -89,14 +89,19 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			mrb.VmSetConst(ir.syms[b], regs[a])
-		case opSelfSend:
+		case opSelfSend, opSend, opSendB:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			c := ir.iSeq.ReadB()
 
-			regs[offset+int(a)] = regs[offset]
+			if opCode == opSelfSend {
+				regs[offset+int(a)] = regs[offset]
+				opCode = opSend
+			}
 
-			ci := mrb.PushCallinfo(ir.syms[b], int(a), c, nil)
+			mid := ir.syms[b]
+
+			ci := mrb.PushCallinfo(mid, int(a), c, nil)
 			ci.stack = append(ci.stack, regs[int(a)+1:int(a)+ci.numArgs+1]...)
 
 			recv := regs[offset]
