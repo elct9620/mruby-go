@@ -47,7 +47,18 @@ func (c *RClass) DefineMethod(mrb *State, name string, m *Method) {
 }
 
 func (c *RClass) LookupMethod(mid Symbol) *Method {
-	return c.mt[mid]
+	class := c
+
+	for class != nil {
+		m := class.mt[mid]
+		if m != nil {
+			return m
+		}
+
+		class = class.super
+	}
+
+	return nil
 }
 
 func (mrb *State) ClassOf(v Value) *RClass {
