@@ -96,7 +96,7 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 
 			if opCode == opSelfSend {
 				regs[offset+int(a)] = regs[offset]
-				opCode = opSend
+				opCode = opSend //nolint:ineffassign
 			}
 
 			mid := ir.syms[b]
