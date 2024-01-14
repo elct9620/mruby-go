@@ -96,7 +96,7 @@ func (feat *RubyFeature) thereShouldReturnSymbol(expected string) error {
 }
 
 func (feat *RubyFeature) thereShouldReturnObject() error {
-	_, ok := feat.ret.(mruby.RBasic)
+	_, ok := feat.ret.(mruby.Basic)
 	if !ok {
 		return fmt.Errorf("expected object, got %T", feat.ret)
 	}

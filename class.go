@@ -3,7 +3,7 @@ package mruby
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
-var _ RBasic = &Class{}
+var _ Basic = &Class{}
 
 type Class struct {
 	object
