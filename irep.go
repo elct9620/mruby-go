@@ -81,6 +81,9 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
 			regs[offset+int(a)] = ir.syms[b]
+		case opLoadNil:
+			a := ir.iSeq.ReadB()
+			regs[offset+int(a)] = nil
 		case opGetConst:
 			a := ir.iSeq.ReadB()
 			b := ir.iSeq.ReadB()
