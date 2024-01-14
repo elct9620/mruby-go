@@ -4,6 +4,7 @@ Feature: Class
       """
       class Foo
       end
+      Foo
       """
     Then there should return class
 

@@ -130,6 +130,20 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 		case opStrCat:
 			a := ir.iSeq.ReadB()
 			regs[offset+int(a)] = fmt.Sprintf("%v%v", regs[offset+int(a)], regs[offset+int(a)+1])
+		case opClass:
+			a := ir.iSeq.ReadB()
+			b := ir.iSeq.ReadB()
+
+			base := regs[offset+int(a)]
+			super := regs[offset+int(a)+1]
+			id := ir.syms[b]
+
+			if base == nil {
+				base = mrb.ObjectClass
+			}
+
+			class := mrb.DefineClass(base, super, id)
+			regs[offset+int(a)] = NewObjectValue(class)
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
