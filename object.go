@@ -10,9 +10,9 @@ type Basic interface {
 	Class() *Class
 }
 
-var _ Basic = &RObject{}
+var _ Basic = &Object{}
 
-type RObject struct {
+type Object struct {
 	object
 }
 

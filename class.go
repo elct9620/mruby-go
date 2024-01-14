@@ -83,7 +83,7 @@ func (c *Class) LookupMethod(mid Symbol) *Method {
 
 func (mrb *State) ClassOf(v Value) *Class {
 	switch v.(type) {
-	case *RObject:
+	case *Object:
 		return mrb.ObjectClass
 	case bool:
 		if v == false {
