@@ -3,27 +3,27 @@ package mruby
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
-var _ RBasic = &RClass{}
+var _ RBasic = &Class{}
 
-type RClass struct {
+type Class struct {
 	object
-	super *RClass
+	super *Class
 	mt
 	iv
 }
 
-func (mrb *State) NewClass(super *RClass) *RClass {
+func (mrb *State) NewClass(super *Class) *Class {
 	return newClass(mrb, super)
 }
 
-func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *RClass {
-	superClass, ok := super.(*RClass)
+func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *Class {
+	superClass, ok := super.(*Class)
 	if super != nil && !ok {
 		panic("super is not a class")
 	}
 
 	// NOTE: check_if_class_or_module
-	outerModule, ok := outer.(*RClass)
+	outerModule, ok := outer.(*Class)
 	if !ok {
 		panic("outer is not a class or module")
 	}
@@ -36,20 +36,20 @@ func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *RClass {
 	return class
 }
 
-func (mrb *State) DefineModule(name string) *RClass {
+func (mrb *State) DefineModule(name string) *Class {
 	return newModule(mrb)
 }
 
-func newModule(mrb *State) *RClass {
-	return &RClass{
+func newModule(mrb *State) *Class {
+	return &Class{
 		super: mrb.ModuleClass,
 		mt:    make(methodTable),
 		iv:    make(ivTable),
 	}
 }
 
-func newClass(mrb *State, super *RClass) *RClass {
-	class := &RClass{
+func newClass(mrb *State, super *Class) *Class {
+	class := &Class{
 		mt: make(methodTable),
 		iv: make(ivTable),
 	}
@@ -61,12 +61,12 @@ func newClass(mrb *State, super *RClass) *RClass {
 	return class
 }
 
-func (c *RClass) DefineMethod(mrb *State, name string, m *Method) {
+func (c *Class) DefineMethod(mrb *State, name string, m *Method) {
 	mid := mrb.Intern(name)
 	c.mt[mid] = m
 }
 
-func (c *RClass) LookupMethod(mid Symbol) *Method {
+func (c *Class) LookupMethod(mid Symbol) *Method {
 	class := c
 
 	for class != nil {
@@ -81,7 +81,7 @@ func (c *RClass) LookupMethod(mid Symbol) *Method {
 	return nil
 }
 
-func (mrb *State) ClassOf(v Value) *RClass {
+func (mrb *State) ClassOf(v Value) *Class {
 	switch v.(type) {
 	case *RObject:
 		return mrb.ObjectClass
@@ -96,7 +96,7 @@ func (mrb *State) ClassOf(v Value) *RClass {
 	return nil
 }
 
-func (mrb *State) FindMethod(recv Value, class *RClass, mid Symbol) *Method {
+func (mrb *State) FindMethod(recv Value, class *Class, mid Symbol) *Method {
 	m := class.LookupMethod(mid)
 	if m != nil {
 		return m

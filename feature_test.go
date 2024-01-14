@@ -105,7 +105,7 @@ func (feat *RubyFeature) thereShouldReturnObject() error {
 }
 
 func (feat *RubyFeature) thereShouldReturnClass() error {
-	_, ok := feat.ret.(*mruby.RClass)
+	_, ok := feat.ret.(*mruby.Class)
 	if !ok {
 		return fmt.Errorf("expected class, got %T", feat.ret)
 	}

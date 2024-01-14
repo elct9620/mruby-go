@@ -3,11 +3,11 @@ package mruby
 import "fmt"
 
 type object struct {
-	class *RClass
+	class *Class
 }
 
 type RBasic interface {
-	Class() *RClass
+	Class() *Class
 }
 
 var _ RBasic = &RObject{}
@@ -16,7 +16,7 @@ type RObject struct {
 	object
 }
 
-func (obj *object) Class() *RClass {
+func (obj *object) Class() *Class {
 	return nil
 }
 

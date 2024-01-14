@@ -19,18 +19,18 @@ type callinfo struct {
 	methodId    Symbol
 	stackOffset int
 	stack       []Value
-	targetClass *RClass
+	targetClass *Class
 }
 
 type State struct {
 	context *context
 
-	ObjectClass  *RClass
-	ModuleClass  *RClass
-	ClassClass   *RClass
-	FalseClass   *RClass
-	TrueClass    *RClass
-	KernelModule *RClass
+	ObjectClass  *Class
+	ModuleClass  *Class
+	ClassClass   *Class
+	FalseClass   *Class
+	TrueClass    *Class
+	KernelModule *Class
 
 	topSelf *RObject
 

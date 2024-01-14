@@ -11,7 +11,7 @@ func (iv ivTable) Set(sym Symbol, val Value) {
 	iv[sym] = val
 }
 
-func (mrb *State) DefineConstById(klass *RClass, name Symbol, val Value) {
+func (mrb *State) DefineConstById(klass *Class, name Symbol, val Value) {
 	klass.Set(name, val)
 }
 
