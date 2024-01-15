@@ -19,3 +19,10 @@ Feature: Object
       Class
       """
     Then there should return object
+
+  Scenario: I can new a object
+    When I execute ruby code:
+      """
+      Object.new
+      """
+    Then there should return object

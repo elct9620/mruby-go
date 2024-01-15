@@ -24,6 +24,20 @@ func initObject(mrb *State) {
 	mrb.FalseClass = mrb.NewClass(mrb.ObjectClass)
 	mrb.TrueClass = mrb.NewClass(mrb.ObjectClass)
 
+	mrb.ObjectClass.DefineMethod(mrb, "new", &Method{
+		Function: func(mrb *State, recv Value) Value {
+			args := mrb.GetArgv()
+			argc := mrb.GetArgc()
+
+			super := mrb.ObjectClass
+			if argc > 0 {
+				super = args[0].(*Class)
+			}
+
+			return &Object{object{super}}
+		},
+	})
+
 	mrb.ObjectClass.DefineMethod(mrb, "puts", &Method{
 		Function: func(mrb *State, recv Value) Value {
 			args := mrb.GetArgv()
