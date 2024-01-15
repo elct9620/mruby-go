@@ -195,11 +195,11 @@ func readSyms(mrb *State, ir *iRep, r *Reader) error {
 		}
 
 		if strLen == nullSymbolLength {
+			ir.syms[i] = 0
 			continue
 		}
 
-		str := make([]byte, strLen)
-		err = r.ReadAs(str)
+		str, err := r.ReadString(int(strLen) + 1)
 		if err != nil {
 			return err
 		}
