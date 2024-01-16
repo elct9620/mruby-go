@@ -6,5 +6,4 @@ Feature: Class
       end
       Foo
       """
-    Then there should return class
-
+    Then there should return class "Foo"

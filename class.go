@@ -1,5 +1,9 @@
 package mruby
 
+const (
+	symClassname = "__classname__"
+)
+
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
@@ -31,9 +35,23 @@ func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *Class {
 	// NOTE: check constant defined in outer
 	class := newClass(mrb, superClass)
 
-	// NOTE: mrb_class_name_class
+	// NOTE: setup_class()
+	class.nameAs(mrb, outerModule, id)
 	outerModule.Set(id, NewObjectValue(class))
 	return class
+}
+
+func (mrb *State) ClassName(class *Class) string {
+	if class == nil {
+		return ""
+	}
+
+	name := class.Get(mrb.Intern(symClassname))
+	if name == nil {
+		return ""
+	}
+
+	return name.(string)
 }
 
 func (mrb *State) DefineModule(name string) *Class {
@@ -79,6 +97,13 @@ func (c *Class) LookupMethod(mid Symbol) *Method {
 	}
 
 	return nil
+}
+
+func (c *Class) nameAs(mrb *State, outer *Class, id Symbol) {
+	name := mrb.SymbolName(id)
+	nsym := mrb.Intern(symClassname)
+
+	c.Set(nsym, name)
 }
 
 func (mrb *State) ClassOf(v Value) *Class {
