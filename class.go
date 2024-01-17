@@ -1,9 +1,5 @@
 package mruby
 
-const (
-	symClassname = "__classname__"
-)
-
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
@@ -46,7 +42,7 @@ func (mrb *State) ClassName(class *Class) string {
 		return ""
 	}
 
-	name := class.Get(mrb.Intern(symClassname))
+	name := class.Get(_classname(mrb))
 	if name == nil {
 		return ""
 	}
@@ -101,7 +97,7 @@ func (c *Class) LookupMethod(mid Symbol) *Method {
 
 func (c *Class) nameAs(mrb *State, outer *Class, id Symbol) {
 	name := mrb.SymbolName(id)
-	nsym := mrb.Intern(symClassname)
+	nsym := _classname(mrb)
 
 	c.Set(nsym, name)
 }
@@ -143,13 +139,13 @@ func initClass(mrb *State) {
 	objectClass.class = classClass
 	moduleClass.class = classClass
 
-	mrb.DefineConstById(basicObject, mrb.Intern("BasicObject"), NewObjectValue(basicObject))
-	mrb.DefineConstById(objectClass, mrb.Intern("Object"), NewObjectValue(objectClass))
-	mrb.DefineConstById(objectClass, mrb.Intern("Module"), NewObjectValue(moduleClass))
-	mrb.DefineConstById(objectClass, mrb.Intern("Class"), NewObjectValue(classClass))
+	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
+	mrb.DefineConstById(objectClass, _Object(mrb), NewObjectValue(objectClass))
+	mrb.DefineConstById(objectClass, _Module(mrb), NewObjectValue(moduleClass))
+	mrb.DefineConstById(objectClass, _Class(mrb), NewObjectValue(classClass))
 
-	basicObject.nameAs(mrb, nil, mrb.Intern("BasicObject"))
-	objectClass.nameAs(mrb, nil, mrb.Intern("Object"))
-	moduleClass.nameAs(mrb, nil, mrb.Intern("Module"))
-	classClass.nameAs(mrb, nil, mrb.Intern("Class"))
+	basicObject.nameAs(mrb, nil, _BasicObject(mrb))
+	objectClass.nameAs(mrb, nil, _Object(mrb))
+	moduleClass.nameAs(mrb, nil, _Module(mrb))
+	classClass.nameAs(mrb, nil, _Class(mrb))
 }
