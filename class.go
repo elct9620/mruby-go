@@ -70,6 +70,8 @@ func newClass(mrb *State, super *Class) *Class {
 
 	if super != nil {
 		class.super = super
+	} else {
+		class.super = mrb.ObjectClass
 	}
 
 	return class
