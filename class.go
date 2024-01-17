@@ -32,7 +32,7 @@ func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *Class {
 	class := newClass(mrb, superClass)
 
 	// NOTE: setup_class()
-	class.nameAs(mrb, outerModule, id)
+	mrb.nameClass(class, outerModule, id)
 	outerModule.Set(id, NewObjectValue(class))
 	return class
 }
@@ -97,11 +97,11 @@ func (c *Class) LookupMethod(mid Symbol) *Method {
 	return nil
 }
 
-func (c *Class) nameAs(mrb *State, outer *Class, id Symbol) {
+func (mrb *State) nameClass(class *Class, outer *Class, id Symbol) {
 	name := mrb.SymbolName(id)
 	nsym := _classname(mrb)
 
-	c.Set(nsym, name)
+	class.Set(nsym, name)
 }
 
 func (mrb *State) ClassOf(v Value) *Class {
@@ -146,8 +146,8 @@ func initClass(mrb *State) {
 	mrb.DefineConstById(objectClass, _Module(mrb), NewObjectValue(moduleClass))
 	mrb.DefineConstById(objectClass, _Class(mrb), NewObjectValue(classClass))
 
-	basicObject.nameAs(mrb, nil, _BasicObject(mrb))
-	objectClass.nameAs(mrb, nil, _Object(mrb))
-	moduleClass.nameAs(mrb, nil, _Module(mrb))
-	classClass.nameAs(mrb, nil, _Class(mrb))
+	mrb.nameClass(basicObject, nil, _BasicObject(mrb))
+	mrb.nameClass(objectClass, nil, _Object(mrb))
+	mrb.nameClass(moduleClass, nil, _Module(mrb))
+	mrb.nameClass(classClass, nil, _Class(mrb))
 }
