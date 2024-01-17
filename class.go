@@ -16,7 +16,11 @@ func (mrb *State) NewClass(super *Class) *Class {
 	return newClass(mrb, super)
 }
 
-func (mrb *State) DefineClass(outer Value, super Value, id Symbol) *Class {
+func (mrb *State) DefineClass(outer Value, super Value, name string) *Class {
+	return mrb.DefineClassById(outer, super, mrb.Intern(name))
+}
+
+func (mrb *State) DefineClassById(outer Value, super Value, id Symbol) *Class {
 	superClass, ok := super.(*Class)
 	if super != nil && !ok {
 		panic("super is not a class")
