@@ -147,4 +147,9 @@ func initClass(mrb *State) {
 	mrb.DefineConstById(objectClass, mrb.Intern("Object"), NewObjectValue(objectClass))
 	mrb.DefineConstById(objectClass, mrb.Intern("Module"), NewObjectValue(moduleClass))
 	mrb.DefineConstById(objectClass, mrb.Intern("Class"), NewObjectValue(classClass))
+
+	basicObject.nameAs(mrb, nil, mrb.Intern("BasicObject"))
+	objectClass.nameAs(mrb, nil, mrb.Intern("Object"))
+	moduleClass.nameAs(mrb, nil, mrb.Intern("Module"))
+	classClass.nameAs(mrb, nil, mrb.Intern("Class"))
 }
