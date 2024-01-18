@@ -3,11 +3,17 @@ package mruby
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
-var _ RObject = &Class{}
+var _ RClass = &Class{}
+
+type RClass interface {
+	RObject
+	Super() RClass
+	LookupMethod(Symbol) *Method
+}
 
 type Class struct {
 	object
-	super *Class
+	super RClass
 	mt
 	iv
 }
@@ -81,21 +87,28 @@ func newClass(mrb *State, super *Class) *Class {
 	return class
 }
 
+func (c *Class) Super() RClass {
+	return c.super
+}
+
 func (c *Class) DefineMethod(mrb *State, name string, m *Method) {
 	mid := mrb.Intern(name)
 	c.mt[mid] = m
 }
 
 func (c *Class) LookupMethod(mid Symbol) *Method {
-	class := c
+	if c.mt[mid] != nil {
+		return c.mt[mid]
+	}
 
-	for class != nil {
-		m := class.mt[mid]
+	super := c.super
+	for super != nil {
+		m := super.LookupMethod(mid)
 		if m != nil {
 			return m
 		}
 
-		class = class.super
+		super = super.Super()
 	}
 
 	return nil
