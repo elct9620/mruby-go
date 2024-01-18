@@ -30,7 +30,7 @@ type State struct {
 	ClassClass   *Class
 	FalseClass   *Class
 	TrueClass    *Class
-	KernelModule *Class
+	KernelModule *Module
 
 	topSelf *Object
 

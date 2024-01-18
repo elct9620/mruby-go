@@ -9,13 +9,19 @@ type RClass interface {
 	RObject
 	Super() RClass
 	LookupMethod(Symbol) *Method
+	Set(Symbol, Value)
+	Get(Symbol) Value
 }
 
-type Class struct {
+type class struct {
 	object
 	super RClass
 	mt
 	iv
+}
+
+type Class struct {
+	class
 }
 
 func (mrb *State) NewClass(super *Class) *Class {
@@ -47,7 +53,7 @@ func (mrb *State) DefineClassById(outer Value, super Value, id Symbol) *Class {
 	return class
 }
 
-func (mrb *State) ClassName(class *Class) string {
+func (mrb *State) ClassName(class RClass) string {
 	if class == nil {
 		return ""
 	}
@@ -60,22 +66,12 @@ func (mrb *State) ClassName(class *Class) string {
 	return name.(string)
 }
 
-func (mrb *State) DefineModule(name string) *Class {
-	return newModule(mrb)
-}
-
-func newModule(mrb *State) *Class {
-	return &Class{
-		super: mrb.ModuleClass,
-		mt:    make(methodTable),
-		iv:    make(ivTable),
-	}
-}
-
 func newClass(mrb *State, super *Class) *Class {
 	class := &Class{
-		mt: make(methodTable),
-		iv: make(ivTable),
+		class: class{
+			mt: make(methodTable),
+			iv: make(ivTable),
+		},
 	}
 
 	if super != nil {
@@ -87,16 +83,16 @@ func newClass(mrb *State, super *Class) *Class {
 	return class
 }
 
-func (c *Class) Super() RClass {
-	return c.super
-}
-
-func (c *Class) DefineMethod(mrb *State, name string, m *Method) {
+func (c *class) DefineMethod(mrb *State, name string, m *Method) {
 	mid := mrb.Intern(name)
 	c.mt[mid] = m
 }
 
-func (c *Class) LookupMethod(mid Symbol) *Method {
+func (c *class) Super() RClass {
+	return c.super
+}
+
+func (c *class) LookupMethod(mid Symbol) *Method {
 	if c.mt[mid] != nil {
 		return c.mt[mid]
 	}
@@ -114,7 +110,7 @@ func (c *Class) LookupMethod(mid Symbol) *Method {
 	return nil
 }
 
-func (mrb *State) nameClass(class *Class, outer *Class, id Symbol) {
+func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 	name := mrb.SymbolName(id)
 	nsym := _classname(mrb)
 
@@ -136,7 +132,7 @@ func (mrb *State) ClassOf(v Value) *Class {
 	return nil
 }
 
-func (mrb *State) FindMethod(recv Value, class *Class, mid Symbol) *Method {
+func (mrb *State) FindMethod(recv Value, class RClass, mid Symbol) *Method {
 	m := class.LookupMethod(mid)
 	if m != nil {
 		return m
@@ -154,9 +150,9 @@ func initClass(mrb *State) {
 	classClass := newClass(mrb, mrb.ModuleClass)
 	mrb.ClassClass = classClass
 
-	basicObject.class = classClass
-	objectClass.class = classClass
-	moduleClass.class = classClass
+	basicObject.object.class = classClass
+	objectClass.object.class = classClass
+	moduleClass.object.class = classClass
 
 	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
 	mrb.DefineConstById(objectClass, _Object(mrb), NewObjectValue(objectClass))
