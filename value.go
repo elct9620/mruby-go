@@ -1,5 +1,5 @@
 package mruby
 
 func NewObjectValue(v any) Value {
-	return v.(Basic)
+	return v.(RObject)
 }

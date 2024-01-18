@@ -6,11 +6,11 @@ type object struct {
 	class *Class
 }
 
-type Basic interface {
+type RObject interface {
 	Class() *Class
 }
 
-var _ Basic = &Object{}
+var _ RObject = &Object{}
 
 type Object struct {
 	object
