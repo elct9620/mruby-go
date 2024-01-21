@@ -11,3 +11,41 @@ The pure go mruby virtual machine implementation.
 ## Roadmap
 
 The priority task is to make the virtual machine available with limited functions, it still depends on `mrbc` command to compile RiteBinary.
+
+## MRB_API
+
+Golang has public and private method design and we can attach method to a struct. Therefore all public method is attach to `*mruby.State` in mruby-go as preferred method.
+
+```go
+func (mrb *State) ObjectInstanceVariableGet(obj RObject, name Symbol) Value {
+  return obj.ivGet(name)
+}
+
+// Prefer
+func (mrb *State) ClassName(class RClass) string {
+	if class == nil {
+		return ""
+	}
+
+	name := mrb.ObjectInstanceVariableGet(class, _classname(mrb)) // <- Prefer this
+	if name == nil {
+		return ""
+	}
+
+	return name.(string)
+}
+
+// Avoid
+func (mrb *State) ClassName(class RClass) string {
+	if class == nil {
+		return ""
+	}
+
+	name := class.ivGet(_classname(mrb)) // <- Avoid this
+	if name == nil {
+		return ""
+	}
+
+	return name.(string)
+}
+```
