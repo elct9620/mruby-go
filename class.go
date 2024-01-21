@@ -15,6 +15,7 @@ type RClass interface {
 	RObject
 	Super() RClass
 	LookupMethod(Symbol) *Method
+	DefineMethod(*State, string, *Method)
 }
 
 type class struct {
@@ -94,7 +95,10 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 		// NOTE: find origin class
 	} else {
 		singletonClass.super = obj.Class()
-		mrb.prepareSingletonClass(singletonClass)
+		err := mrb.prepareSingletonClass(singletonClass)
+		if err != nil {
+			return err
+		}
 	}
 
 	mrb.ObjectInstanceVariableSetForce(singletonClass, _attached(mrb), obj)
@@ -200,10 +204,10 @@ func initClass(mrb *State) {
 	objectClass.object.class = classClass
 	moduleClass.object.class = classClass
 
-	mrb.prepareSingletonClass(basicObject)
-	mrb.prepareSingletonClass(objectClass)
-	mrb.prepareSingletonClass(moduleClass)
-	mrb.prepareSingletonClass(classClass)
+	mrb.prepareSingletonClass(basicObject) // nolint: errcheck
+	mrb.prepareSingletonClass(objectClass) // nolint: errcheck
+	mrb.prepareSingletonClass(moduleClass) // nolint: errcheck
+	mrb.prepareSingletonClass(classClass)  // nolint: errcheck
 
 	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
 	mrb.DefineConstById(objectClass, _Object(mrb), NewObjectValue(objectClass))
