@@ -8,16 +8,35 @@ type object struct {
 
 type RObject interface {
 	Class() RClass
+	ivPut(Symbol, Value)
+	ivGet(Symbol) Value
 }
 
 var _ RObject = &Object{}
 
 type Object struct {
 	object
+	iv
 }
 
 func (obj *object) Class() RClass {
-	return nil
+	return obj.class
+}
+
+func (obj *Object) ivPut(sym Symbol, val Value) {
+	if obj.iv == nil {
+		obj.iv = make(iv)
+	}
+
+	obj.iv.Put(sym, val)
+}
+
+func (obj *Object) ivGet(sym Symbol) Value {
+	if obj.iv == nil {
+		return nil
+	}
+
+	return obj.iv.Get(sym)
 }
 
 func initObject(mrb *State) {
@@ -34,7 +53,7 @@ func initObject(mrb *State) {
 				super = args[0].(*Class)
 			}
 
-			return &Object{object{super}}
+			return &Object{object{super}, nil}
 		},
 	})
 

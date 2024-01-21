@@ -15,8 +15,6 @@ type RClass interface {
 	RObject
 	Super() RClass
 	LookupMethod(Symbol) *Method
-	Set(Symbol, Value)
-	Get(Symbol) Value
 }
 
 type class struct {
@@ -35,7 +33,7 @@ type SingletonClass struct {
 }
 
 func (mrb *State) NewClass(super *Class) *Class {
-	return newClass(mrb, super)
+	return mrb.bootDefineClass(super)
 }
 
 func (mrb *State) DefineClass(outer Value, super Value, name string) *Class {
@@ -55,11 +53,11 @@ func (mrb *State) DefineClassById(outer Value, super Value, id Symbol) *Class {
 	}
 
 	// NOTE: check constant defined in outer
-	class := newClass(mrb, superClass)
+	class := mrb.bootDefineClass(superClass)
 
 	// NOTE: setup_class()
 	mrb.nameClass(class, outerModule, id)
-	outerModule.Set(id, NewObjectValue(class))
+	mrb.ObjectInstanceVariableSetForce(outerModule, id, NewObjectValue(class))
 	return class
 }
 
@@ -68,7 +66,7 @@ func (mrb *State) ClassName(class RClass) string {
 		return ""
 	}
 
-	name := class.Get(_classname(mrb))
+	name := mrb.ObjectInstanceVariableGet(class, _classname(mrb))
 	if name == nil {
 		return ""
 	}
@@ -85,7 +83,7 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 		return nil
 	}
 
-	singletonClass := mrb.allocSingletonClass()
+	singletonClass := mrb.AllocSingletonClass()
 	if class, ok := obj.(*Class); ok {
 		if class.Super() != nil {
 			singletonClass.super = class.Super()
@@ -99,25 +97,36 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 		mrb.prepareSingletonClass(singletonClass)
 	}
 
-	singletonClass.Set(_attached(mrb), obj)
+	mrb.ObjectInstanceVariableSetForce(singletonClass, _attached(mrb), obj)
 	return nil
 }
 
-func newClass(mrb *State, super *Class) *Class {
-	class := &Class{
-		class: class{
-			mt: make(methodTable),
-			iv: make(ivTable),
-		},
-	}
-
+func (mrb *State) bootDefineClass(super *Class) *Class {
+	class := mrb.AllocClass()
 	if super != nil {
 		class.super = super
 	} else {
 		class.super = mrb.ObjectClass
 	}
 
+	class.mt = make(methodTable)
 	return class
+}
+
+func (c *class) ivPut(sym Symbol, val Value) {
+	if c.iv == nil {
+		c.iv = make(iv)
+	}
+
+	c.iv.Put(sym, val)
+}
+
+func (c *class) ivGet(sym Symbol) Value {
+	if c.iv == nil {
+		return nil
+	}
+
+	return c.iv.Get(sym)
 }
 
 func (c *class) DefineMethod(mrb *State, name string, m *Method) {
@@ -151,7 +160,7 @@ func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 	name := mrb.SymbolName(id)
 	nsym := _classname(mrb)
 
-	class.Set(nsym, name)
+	mrb.ObjectInstanceVariableSetForce(class, nsym, name)
 }
 
 func (mrb *State) ClassOf(v Value) *Class {
@@ -179,12 +188,12 @@ func (mrb *State) FindMethod(recv Value, class RClass, mid Symbol) *Method {
 }
 
 func initClass(mrb *State) {
-	basicObject := newClass(mrb, nil)
-	objectClass := newClass(mrb, basicObject)
+	basicObject := mrb.bootDefineClass(nil)
+	objectClass := mrb.bootDefineClass(basicObject)
 	mrb.ObjectClass = objectClass
-	moduleClass := newClass(mrb, mrb.ObjectClass)
+	moduleClass := mrb.bootDefineClass(objectClass)
 	mrb.ModuleClass = moduleClass
-	classClass := newClass(mrb, mrb.ModuleClass)
+	classClass := mrb.bootDefineClass(moduleClass)
 	mrb.ClassClass = classClass
 
 	basicObject.object.class = classClass
