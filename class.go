@@ -1,5 +1,11 @@
 package mruby
 
+import "errors"
+
+var (
+	ErrObjectClassNotExists = errors.New("Object class not exists")
+)
+
 type methodTable map[Symbol]*Method
 type mt = methodTable
 
@@ -21,6 +27,10 @@ type class struct {
 }
 
 type Class struct {
+	class
+}
+
+type SingletonClass struct {
 	class
 }
 
@@ -64,6 +74,33 @@ func (mrb *State) ClassName(class RClass) string {
 	}
 
 	return name.(string)
+}
+
+func (mrb *State) prepareSingletonClass(obj RObject) error {
+	if obj.Class() == nil {
+		return ErrObjectClassNotExists
+	}
+
+	if _, ok := obj.Class().(*SingletonClass); ok {
+		return nil
+	}
+
+	singletonClass := mrb.allocSingletonClass()
+	if class, ok := obj.(*Class); ok {
+		if class.Super() != nil {
+			singletonClass.super = class.Super()
+		} else {
+			singletonClass.super = mrb.ClassClass
+		}
+	} else if _, ok := obj.(*SingletonClass); ok {
+		// NOTE: find origin class
+	} else {
+		singletonClass.super = obj.Class()
+		mrb.prepareSingletonClass(singletonClass)
+	}
+
+	singletonClass.Set(_attached(mrb), obj)
+	return nil
 }
 
 func newClass(mrb *State, super *Class) *Class {
@@ -153,6 +190,11 @@ func initClass(mrb *State) {
 	basicObject.object.class = classClass
 	objectClass.object.class = classClass
 	moduleClass.object.class = classClass
+
+	mrb.prepareSingletonClass(basicObject)
+	mrb.prepareSingletonClass(objectClass)
+	mrb.prepareSingletonClass(moduleClass)
+	mrb.prepareSingletonClass(classClass)
 
 	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
 	mrb.DefineConstById(objectClass, _Object(mrb), NewObjectValue(objectClass))

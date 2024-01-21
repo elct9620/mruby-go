@@ -10,6 +10,7 @@ func predefineSymbol(name string) predefineSymbolFunc {
 
 var (
 	_classname   = predefineSymbol("__classname__")
+	_attached    = predefineSymbol("__attached__")
 	_BasicObject = predefineSymbol("BasicObject")
 	_Object      = predefineSymbol("Object")
 	_Module      = predefineSymbol("Module")
