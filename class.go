@@ -33,29 +33,8 @@ type SingletonClass struct {
 	class
 }
 
-func (mrb *State) NewClass(super *Class) *Class {
-	return mrb.bootDefineClass(super)
-}
-
-func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) *Class {
-	superClass, ok := super.(*Class)
-	if super != nil && !ok {
-		panic("super is not a class")
-	}
-
-	// NOTE: check_if_class_or_module
-	outerModule, ok := outer.(*Class)
-	if !ok {
-		panic("outer is not a class or module")
-	}
-
-	// NOTE: check constant defined in outer
-	class := mrb.bootDefineClass(superClass)
-
-	// NOTE: setup_class()
-	mrb.nameClass(class, outerModule, id)
-	mrb.ObjectInstanceVariableSetForce(outerModule, id, NewObjectValue(class))
-	return class
+func (mrb *State) DefineClassId(name Symbol, super *Class) (*Class, error) {
+	return mrb.defineClass(name, super, mrb.ObjectClass)
 }
 
 func (mrb *State) ClassName(class RClass) string {
@@ -69,6 +48,46 @@ func (mrb *State) ClassName(class RClass) string {
 	}
 
 	return name.(string)
+}
+
+func (mrb *State) ClassNew(super RClass) (*Class, error) {
+	class := mrb.bootDefineClass(super)
+	err := mrb.prepareSingletonClass(class)
+	if err != nil {
+		return nil, err
+	}
+
+	return class, nil
+}
+
+func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (*Class, error) {
+	superClass, ok := super.(*Class)
+	if super != nil && !ok {
+		panic("super is not a class")
+	}
+
+	// NOTE: check_if_class_or_module
+	outerModule, ok := outer.(*Class)
+	if !ok {
+		panic("outer is not a class or module")
+	}
+
+	return mrb.defineClass(id, superClass, outerModule)
+}
+
+func (mrb *State) defineClass(name Symbol, super RClass, outer RClass) (*Class, error) {
+	class, err := mrb.ClassNew(super)
+	if err != nil {
+		return nil, err
+	}
+
+	mrb.setupClass(class, outer, name)
+	return class, nil
+}
+
+func (mrb *State) setupClass(class RClass, outer RClass, id Symbol) {
+	mrb.nameClass(class, outer, id)
+	mrb.ObjectInstanceVariableSetForce(outer, id, NewObjectValue(class))
 }
 
 func (mrb *State) prepareSingletonClass(obj RObject) error {
@@ -101,7 +120,7 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 	return nil
 }
 
-func (mrb *State) bootDefineClass(super *Class) *Class {
+func (mrb *State) bootDefineClass(super RClass) *Class {
 	class := mrb.AllocClass()
 	if super != nil {
 		class.super = super

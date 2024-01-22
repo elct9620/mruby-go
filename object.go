@@ -39,9 +39,15 @@ func (obj *Object) ivGet(sym Symbol) Value {
 	return obj.iv.Get(sym)
 }
 
-func initObject(mrb *State) {
-	mrb.FalseClass = mrb.NewClass(mrb.ObjectClass)
-	mrb.TrueClass = mrb.NewClass(mrb.ObjectClass)
+func initObject(mrb *State) (err error) {
+	mrb.FalseClass, err = mrb.DefineClassId(_FalseClass(mrb), mrb.ObjectClass)
+	if err != nil {
+		return err
+	}
+	mrb.TrueClass, err = mrb.DefineClassId(_TrueClass(mrb), mrb.ObjectClass)
+	if err != nil {
+		return err
+	}
 
 	mrb.ObjectClass.DefineMethod(mrb, "new", &Method{
 		Function: func(mrb *State, recv Value) Value {
@@ -64,4 +70,6 @@ func initObject(mrb *State) {
 			return args[0]
 		},
 	})
+
+	return nil
 }

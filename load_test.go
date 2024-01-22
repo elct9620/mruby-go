@@ -19,7 +19,11 @@ func Test_Mrb_Load(t *testing.T) {
 		0x44, 0x00, 0x00, 0x00, 0x00, 0x08,
 	})
 
-	mrb := mruby.New()
+	mrb, err := mruby.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	res, err := mrb.Load(buffer)
 	if err != nil {
 		t.Fatal(err)
@@ -32,7 +36,11 @@ func Test_Mrb_Load(t *testing.T) {
 }
 
 func Test_Mrb_LoadString(t *testing.T) {
-	mrb := mruby.New()
+	mrb, err := mruby.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	res, err := mrb.LoadString("1 + 1")
 	if err != nil {
 		t.Fatal(err)

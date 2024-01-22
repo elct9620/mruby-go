@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	mrb := mruby.New()
+	mrb, err := mruby.New()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	compiled, err := mruby.Compile(os.Stdin)
 	if err != nil {

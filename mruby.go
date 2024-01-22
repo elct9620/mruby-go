@@ -38,7 +38,7 @@ type State struct {
 	symbolIndex int
 }
 
-func New() *State {
+func New() (*State, error) {
 	state := &State{
 		context: &context{
 			callinfo: stack.New[*callinfo](),
@@ -48,9 +48,12 @@ func New() *State {
 		symbolIndex: 0,
 	}
 
-	initCore(state)
+	err := initCore(state)
+	if err != nil {
+		return nil, err
+	}
 
-	return state
+	return state, nil
 }
 
 func (s *State) GetArgc() int {

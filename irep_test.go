@@ -23,7 +23,10 @@ func TestLoadInteger(t *testing.T) {
 		{"4 + 3", 7},
 	}
 
-	mrb := mruby.New()
+	mrb, err := mruby.New()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, tc := range tests {
 		tc := tc

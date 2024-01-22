@@ -1,7 +1,12 @@
 package mruby
 
-func initCore(mrb *State) {
+func initCore(mrb *State) (err error) {
 	initClass(mrb)
-	initObject(mrb)
+	err = initObject(mrb)
+	if err != nil {
+		return err
+	}
 	initKernel(mrb)
+
+	return nil
 }

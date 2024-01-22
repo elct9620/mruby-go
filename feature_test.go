@@ -120,8 +120,13 @@ func (feat *RubyFeature) thereShouldReturnClass(expected string) error {
 }
 
 func InitializeScenario(s *godog.ScenarioContext) {
+	mrb, err := mruby.New()
+	if err != nil {
+		panic(err)
+	}
+
 	feat := RubyFeature{
-		mrb: mruby.New(),
+		mrb: mrb,
 	}
 
 	s.Step(`^I execute ruby code:$`, feat.iExecuteRubyCode)
