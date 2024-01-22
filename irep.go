@@ -142,7 +142,7 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 				base = mrb.ObjectClass
 			}
 
-			class := mrb.DefineClassById(base, super, id)
+			class := mrb.vmDefineClass(base, super, id)
 			regs[offset+int(a)] = NewObjectValue(class)
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
