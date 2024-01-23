@@ -50,26 +50,30 @@ func initObject(mrb *State) (err error) {
 	}
 
 	mrb.ObjectClass.DefineMethod(mrb, "new", &Method{
-		Function: func(mrb *State, recv Value) Value {
-			args := mrb.GetArgv()
-			argc := mrb.GetArgc()
-
-			super := mrb.ObjectClass
-			if argc > 0 {
-				super = args[0].(*Class)
-			}
-
-			return &Object{object{super}, nil}
-		},
+		Function: objectNew,
 	})
 
 	mrb.ObjectClass.DefineMethod(mrb, "puts", &Method{
-		Function: func(mrb *State, recv Value) Value {
-			args := mrb.GetArgv()
-			fmt.Println(args...)
-			return args[0]
-		},
+		Function: objectPuts,
 	})
 
 	return nil
+}
+
+func objectNew(mrb *State, recv Value) Value {
+	args := mrb.GetArgv()
+	argc := mrb.GetArgc()
+
+	super := mrb.ObjectClass
+	if argc > 0 {
+		super = args[0].(*Class)
+	}
+
+	return &Object{object{super}, nil}
+}
+
+func objectPuts(mrb *State, recv Value) Value {
+	args := mrb.GetArgv()
+	fmt.Println(args...)
+	return args[0]
 }
