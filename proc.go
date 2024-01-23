@@ -60,3 +60,9 @@ func readSectionHeader(r io.Reader, remain uint32) (*sectionHeader, error) {
 
 	return &header, nil
 }
+
+func newMethodFromFunc(function Function) *Method {
+	return &Method{
+		Function: function,
+	}
+}

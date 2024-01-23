@@ -1,6 +1,8 @@
 package mruby
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrObjectClassNotExists = errors.New("Object class not exists")
@@ -15,7 +17,8 @@ type RClass interface {
 	RObject
 	Super() RClass
 	LookupMethod(Symbol) *Method
-	DefineMethod(*State, string, *Method)
+	mtPut(Symbol, *Method)
+	mtGet(Symbol) *Method
 }
 
 type class struct {
@@ -58,6 +61,11 @@ func (mrb *State) ClassNew(super RClass) (*Class, error) {
 	}
 
 	return class, nil
+}
+
+func (mrb *State) DefineMethodId(class RClass, name Symbol, function Function) {
+	method := newMethodFromFunc(function)
+	mrb.defineMethodRaw(class, name, method)
 }
 
 func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (*Class, error) {
@@ -132,6 +140,10 @@ func (mrb *State) bootDefineClass(super RClass) *Class {
 	return class
 }
 
+func (mrb *State) defineMethodRaw(class RClass, name Symbol, method *Method) {
+	class.mtPut(name, method)
+}
+
 func (c *class) ivPut(sym Symbol, val Value) {
 	if c.iv == nil {
 		c.iv = make(iv)
@@ -148,9 +160,20 @@ func (c *class) ivGet(sym Symbol) Value {
 	return c.iv.Get(sym)
 }
 
-func (c *class) DefineMethod(mrb *State, name string, m *Method) {
-	mid := mrb.Intern(name)
-	c.mt[mid] = m
+func (c *class) mtPut(sym Symbol, method *Method) {
+	if c.mt == nil {
+		c.mt = make(methodTable)
+	}
+
+	c.mt[sym] = method
+}
+
+func (c *class) mtGet(sym Symbol) *Method {
+	if c.mt == nil {
+		return nil
+	}
+
+	return c.mt[sym]
 }
 
 func (c *class) Super() RClass {
@@ -158,8 +181,10 @@ func (c *class) Super() RClass {
 }
 
 func (c *class) LookupMethod(mid Symbol) *Method {
-	if c.mt[mid] != nil {
-		return c.mt[mid]
+	m := c.mtGet(mid)
+
+	if m != nil {
+		return m
 	}
 
 	super := c.super

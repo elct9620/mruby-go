@@ -109,6 +109,7 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 
 			recv := regs[offset]
 			ci.targetClass = mrb.ClassOf(recv)
+
 			method := mrb.FindMethod(recv, ci.targetClass, ci.methodId)
 
 			if method == nil {

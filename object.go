@@ -49,13 +49,10 @@ func initObject(mrb *State) (err error) {
 		return err
 	}
 
-	mrb.ObjectClass.DefineMethod(mrb, "new", &Method{
-		Function: objectNew,
-	})
+	mrb.DefineMethodId(mrb.ObjectClass, _new(mrb), objectNew)
 
-	mrb.ObjectClass.DefineMethod(mrb, "puts", &Method{
-		Function: objectPuts,
-	})
+	putsSym := mrb.Intern("puts")
+	mrb.DefineMethodId(mrb.ObjectClass, putsSym, objectPuts)
 
 	return nil
 }
