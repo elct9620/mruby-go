@@ -8,7 +8,7 @@ var (
 	ErrObjectClassNotExists = errors.New("Object class not exists")
 )
 
-type methodTable map[Symbol]*Method
+type methodTable map[Symbol]Method
 type mt = methodTable
 
 var _ RClass = &Class{}
@@ -16,8 +16,8 @@ var _ RClass = &Class{}
 type RClass interface {
 	RObject
 	Super() RClass
-	mtPut(Symbol, *Method)
-	mtGet(Symbol) *Method
+	mtPut(Symbol, Method)
+	mtGet(Symbol) Method
 }
 
 type class struct {
@@ -82,7 +82,7 @@ func (mrb *State) DefineMethodId(class RClass, name Symbol, function Function) {
 	mrb.defineMethodRaw(class, name, method)
 }
 
-func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) *Method {
+func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) Method {
 	c := class
 	for c != nil {
 		m := c.mtGet(mid)
@@ -168,7 +168,7 @@ func (mrb *State) bootDefineClass(super RClass) *Class {
 	return class
 }
 
-func (mrb *State) defineMethodRaw(class RClass, name Symbol, method *Method) {
+func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 	class.mtPut(name, method)
 }
 
@@ -188,7 +188,7 @@ func (c *class) ivGet(sym Symbol) Value {
 	return c.iv.Get(sym)
 }
 
-func (c *class) mtPut(sym Symbol, method *Method) {
+func (c *class) mtPut(sym Symbol, method Method) {
 	if c.mt == nil {
 		c.mt = make(methodTable)
 	}
@@ -196,7 +196,7 @@ func (c *class) mtPut(sym Symbol, method *Method) {
 	c.mt[sym] = method
 }
 
-func (c *class) mtGet(sym Symbol) *Method {
+func (c *class) mtGet(sym Symbol) Method {
 	if c.mt == nil {
 		return nil
 	}

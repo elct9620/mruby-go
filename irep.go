@@ -118,7 +118,7 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 				break
 			}
 
-			regs[offset+int(a)] = method.Function(mrb, recv)
+			regs[offset+int(a)] = method.Call(mrb, recv)
 			mrb.PopCallinfo()
 		case opString:
 			a := ir.iSeq.ReadB()

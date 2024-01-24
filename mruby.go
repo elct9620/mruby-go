@@ -8,12 +8,6 @@ type (
 	Value = any
 )
 
-type Function func(*State, Value) Value
-
-type Method struct {
-	Function
-}
-
 type callinfo struct {
 	numArgs     int
 	methodId    Symbol
