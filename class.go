@@ -16,7 +16,6 @@ var _ RClass = &Class{}
 type RClass interface {
 	RObject
 	Super() RClass
-	LookupMethod(Symbol) *Method
 	mtPut(Symbol, *Method)
 	mtGet(Symbol) *Method
 }
@@ -34,6 +33,21 @@ type Class struct {
 
 type SingletonClass struct {
 	class
+}
+
+func (mrb *State) ClassOf(v Value) *Class {
+	switch v.(type) {
+	case *Object:
+		return mrb.ObjectClass
+	case bool:
+		if v == false {
+			return mrb.FalseClass
+		}
+
+		return mrb.TrueClass
+	}
+
+	return nil
 }
 
 func (mrb *State) DefineClassId(name Symbol, super *Class) (*Class, error) {
@@ -66,6 +80,20 @@ func (mrb *State) ClassNew(super RClass) (*Class, error) {
 func (mrb *State) DefineMethodId(class RClass, name Symbol, function Function) {
 	method := newMethodFromFunc(function)
 	mrb.defineMethodRaw(class, name, method)
+}
+
+func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) *Method {
+	c := class
+	for c != nil {
+		m := c.mtGet(mid)
+		if m != nil {
+			return m
+		}
+
+		c = c.Super()
+	}
+
+	return nil
 }
 
 func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (*Class, error) {
@@ -180,55 +208,11 @@ func (c *class) Super() RClass {
 	return c.super
 }
 
-func (c *class) LookupMethod(mid Symbol) *Method {
-	m := c.mtGet(mid)
-
-	if m != nil {
-		return m
-	}
-
-	super := c.super
-	for super != nil {
-		m := super.LookupMethod(mid)
-		if m != nil {
-			return m
-		}
-
-		super = super.Super()
-	}
-
-	return nil
-}
-
 func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 	name := mrb.SymbolName(id)
 	nsym := _classname(mrb)
 
 	mrb.ObjectInstanceVariableSetForce(class, nsym, name)
-}
-
-func (mrb *State) ClassOf(v Value) *Class {
-	switch v.(type) {
-	case *Object:
-		return mrb.ObjectClass
-	case bool:
-		if v == false {
-			return mrb.FalseClass
-		}
-
-		return mrb.TrueClass
-	}
-
-	return nil
-}
-
-func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) *Method {
-	m := class.LookupMethod(mid)
-	if m != nil {
-		return m
-	}
-
-	return nil
 }
 
 func initClass(mrb *State) {
