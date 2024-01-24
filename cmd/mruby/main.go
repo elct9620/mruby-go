@@ -19,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	res, err := mrb.Load(bytes.NewBuffer(compiled))
+	res, err := mrb.LoadIRep(bytes.NewBuffer(compiled))
 	if err != nil {
 		log.Fatal(err)
 	}

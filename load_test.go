@@ -24,7 +24,7 @@ func Test_Mrb_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res, err := mrb.Load(buffer)
+	res, err := mrb.LoadIRep(buffer)
 	if err != nil {
 		t.Fatal(err)
 	}

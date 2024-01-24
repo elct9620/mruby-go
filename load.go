@@ -18,11 +18,11 @@ func (s *State) LoadString(code string) (Value, error) {
 		return nil, err
 	}
 
-	return s.Load(bytes.NewBufferString(string(compiled)))
+	return s.LoadIRep(bytes.NewBufferString(string(compiled)))
 }
 
 // Load execute RITE binary
-func (s *State) Load(r io.Reader) (Value, error) {
+func (s *State) LoadIRep(r io.Reader) (Value, error) {
 	proc, err := newProc(s, r)
 	if err != nil {
 		return nil, err
