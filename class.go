@@ -222,7 +222,7 @@ func (mrb *State) ClassOf(v Value) *Class {
 	return nil
 }
 
-func (mrb *State) FindMethod(recv Value, class RClass, mid Symbol) *Method {
+func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) *Method {
 	m := class.LookupMethod(mid)
 	if m != nil {
 		return m
