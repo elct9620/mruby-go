@@ -22,22 +22,13 @@ func (s *State) LoadString(code string) (Value, error) {
 }
 
 // Load execute RITE binary
-func (s *State) LoadIRep(r io.Reader) (Value, error) {
-	proc, err := readIRep(s, r)
+func (mrb *State) LoadIRep(r io.Reader) (Value, error) {
+	proc, err := readIRep(mrb, r)
 	if err != nil {
 		return nil, err
 	}
 
-	if s.context.stack == nil {
-		s.context.stack = make([]Value, StackInitSize)
-		s.context.stackBase = 0
-		s.context.stackEnd = StackInitSize - 1
-	}
-
-	s.context.stack[0] = s.topSelf
-	s.context.callinfo.Push(&callinfo{})
-
-	return proc.Execute(s)
+	return mrb.TopRun(proc, mrb.TopSelf())
 }
 
 func readIRep(mrb *State, r io.Reader) (RProc, error) {
