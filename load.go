@@ -23,7 +23,7 @@ func (s *State) LoadString(code string) (Value, error) {
 
 // Load execute RITE binary
 func (s *State) LoadIRep(r io.Reader) (Value, error) {
-	proc, err := newProc(s, r)
+	proc, err := readIRep(s, r)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,58 @@ func (s *State) LoadIRep(r io.Reader) (Value, error) {
 	return proc.Execute(s)
 }
 
-func readIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
+func readIRep(mrb *State, r io.Reader) (RProc, error) {
+	var header binaryHeader
+	err := binaryRead(r, &header)
+	if err != nil {
+		return nil, err
+	}
+
+	var executable *iRep
+
+	remain := header.Size - binaryHeaderSize
+	for remain > sectionHeaderSize {
+		header, err := readSectionHeader(r, remain)
+
+		switch header.String() {
+		case sectionTypeIRep:
+			executable, err = readSectionIRep(mrb, r, header.Size)
+		case sectionTypeDebug:
+			err = noopSection(r, header.Size)
+		case sectionTypeLv:
+			err = noopSection(r, header.Size)
+		case sectionTypeEof:
+			break
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		remain -= header.Size
+	}
+
+	return &proc{
+		executable: executable,
+	}, nil
+}
+
+func readSectionHeader(r io.Reader, remain uint32) (*sectionHeader, error) {
+	var header sectionHeader
+	err := binaryRead(r, &header)
+	if err != nil {
+		return nil, err
+	}
+
+	isOverSize := header.Size > remain
+	if isOverSize {
+		return nil, ErrSectionOverSize
+	}
+
+	return &header, nil
+}
+
+func readSectionIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
 	var riteVersion [4]byte
 	err := binaryRead(r, &riteVersion)
 	if err != nil {
