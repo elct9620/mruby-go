@@ -1,17 +1,17 @@
 package mruby
 
 type RProc interface {
-	Execute(state *State) (Value, error)
-}
-
-type executable interface {
-	Execute(state *State) (Value, error)
+	Body() any
 }
 
 var _ RProc = &proc{}
 
 type proc struct {
-	executable
+	body any
+}
+
+func (p *proc) Body() any {
+	return p.body
 }
 
 func newMethodFromFunc(function Function) Method {
