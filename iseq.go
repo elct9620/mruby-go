@@ -31,3 +31,7 @@ func (code *Code) ReadW() []byte {
 	code.cursor += 4
 	return w
 }
+
+func (code *Code) Clone() *Code {
+	return &Code{binary: code.binary, cursor: code.cursor}
+}
