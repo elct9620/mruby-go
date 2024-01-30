@@ -1,32 +1,33 @@
 package mruby
 
-type instructionSequence struct {
+// mrb_code aka iseq
+type Code struct {
 	binary []byte
 	cursor int
 }
 
-func newInstructionSequence(bytes []byte) *instructionSequence {
-	return &instructionSequence{binary: bytes, cursor: 0}
+func NewCode(bytes []byte) *Code {
+	return &Code{binary: bytes, cursor: 0}
 }
 
-func (iseq *instructionSequence) ReadCode() code {
-	return iseq.ReadB()
+func (code *Code) Next() opCode {
+	return code.ReadB()
 }
 
-func (iseq *instructionSequence) ReadB() byte {
-	b := iseq.binary[iseq.cursor]
-	iseq.cursor++
+func (code *Code) ReadB() byte {
+	b := code.binary[code.cursor]
+	code.cursor++
 	return b
 }
 
-func (iseq *instructionSequence) ReadS() []byte {
-	s := iseq.binary[iseq.cursor : iseq.cursor+2]
-	iseq.cursor += 2
+func (code *Code) ReadS() []byte {
+	s := code.binary[code.cursor : code.cursor+2]
+	code.cursor += 2
 	return s
 }
 
-func (iseq *instructionSequence) ReadW() []byte {
-	w := iseq.binary[iseq.cursor : iseq.cursor+4]
-	iseq.cursor += 4
+func (code *Code) ReadW() []byte {
+	w := code.binary[code.cursor : code.cursor+4]
+	code.cursor += 4
 	return w
 }

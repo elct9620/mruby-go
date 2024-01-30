@@ -26,7 +26,7 @@ type iRep struct {
 	iLen      uint32
 	pLen      uint16
 	sLen      uint16
-	iSeq      *instructionSequence
+	iSeq      *Code
 	poolValue []Value
 	syms      []Symbol
 }
@@ -50,7 +50,7 @@ func (ir *iRep) Execute(mrb *State) (Value, error) {
 	regs := mrb.context.stack
 
 	for {
-		opCode := ir.iSeq.ReadCode()
+		opCode := ir.iSeq.Next()
 
 		switch opCode {
 		case opMove:
@@ -181,7 +181,7 @@ func readISeq(mrb *State, ir *iRep, r *Reader) error {
 		return err
 	}
 
-	ir.iSeq = newInstructionSequence(binary)
+	ir.iSeq = NewCode(binary)
 	return nil
 }
 

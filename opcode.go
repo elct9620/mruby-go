@@ -1,10 +1,10 @@
 package mruby
 
-type code = uint8
+type opCode = uint8
 
 //nolint:unused
 const (
-	opNop code = iota
+	opNop opCode = iota
 	opMove
 	opLoadL
 	opLoadI
