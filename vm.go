@@ -15,6 +15,10 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 
 	mrb.context.stack[0] = mrb.topSelf
 
+	return mrb.VmExec(proc)
+}
+
+func (mrb *State) VmExec(proc RProc) (Value, error) {
 	return proc.Execute(mrb)
 }
 
