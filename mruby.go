@@ -13,7 +13,7 @@ type callinfo struct {
 	methodId    Symbol
 	stackOffset int
 	stack       []Value
-	targetClass *Class
+	targetClass RClass
 }
 
 type State struct {
@@ -56,8 +56,6 @@ func (s *State) GetArgc() int {
 
 func (s *State) GetArgv() []Value {
 	ci := s.context.GetCallinfo()
-	begin := ci.stackOffset + 1
-	end := begin + ci.numArgs
 
-	return s.context.stack[begin:end]
+	return s.context.Slice(1, ci.numArgs)
 }
