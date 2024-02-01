@@ -1,9 +1,9 @@
 package mruby
 
 import (
-	"fmt"
 	"encoding/binary"
 	"errors"
+	"fmt"
 )
 
 var (
@@ -24,8 +24,6 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 
 	if mrb.context.stack == nil {
 		mrb.context.stack = make([]Value, StackInitSize)
-		mrb.context.stackBase = 0
-		mrb.context.stackEnd = StackInitSize - 1
 	}
 
 	mrb.context.stack[0] = mrb.topSelf
