@@ -12,7 +12,6 @@ type callinfo struct {
 	numArgs     int
 	methodId    Symbol
 	stackOffset int
-	stack       []Value
 	targetClass RClass
 }
 

@@ -39,8 +39,6 @@ func (mrb *State) ClassOf(v Value) RClass {
 	switch v.(type) {
 	case RObject:
 		return mrb.ObjectClass
-	case RClass:
-		return mrb.ObjectClass
 	case bool:
 		if v == false {
 			return mrb.FalseClass
