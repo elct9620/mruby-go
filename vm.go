@@ -96,7 +96,7 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 
 			ci := mrb.PushCallinfo(mid, int(a), c, nil)
 			recv := ctx.Get(0)
-			ci.targetClass = mrb.ClassOf(recv)
+			ci.targetClass = mrb.Class(recv)
 
 			method := mrb.VmFindMethod(recv, ci.targetClass, ci.methodId)
 

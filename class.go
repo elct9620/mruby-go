@@ -35,7 +35,7 @@ type SingletonClass struct {
 	class
 }
 
-func (mrb *State) ClassOf(v Value) RClass {
+func (mrb *State) Class(v Value) RClass {
 	switch v := v.(type) {
 	case RClass:
 		return v.Class()
