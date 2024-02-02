@@ -36,17 +36,17 @@ type SingletonClass struct {
 }
 
 func (mrb *State) ClassOf(v Value) RClass {
-	switch v.(type) {
+	switch v := v.(type) {
 	case RClass:
-		return (v.(RClass)).Class()
+		return v.Class()
 	case RObject:
 		return mrb.ObjectClass
 	case bool:
-		if v == false {
-			return mrb.FalseClass
+		if v {
+			return mrb.TrueClass
 		}
 
-		return mrb.TrueClass
+		return mrb.FalseClass
 	}
 
 	return nil
