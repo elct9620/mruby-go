@@ -94,7 +94,7 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 
 			mid := ir.syms[b]
 
-			ci := mrb.PushCallinfo(mid, int(a), c, nil)
+			ci := mrb.callinfoPush(mid, int(a), c, nil)
 			recv := ctx.Get(0)
 			ci.targetClass = mrb.Class(recv)
 
@@ -102,12 +102,12 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 
 			if method == nil {
 				ctx.Set(int(a), nil)
-				mrb.PopCallinfo()
+				mrb.callinfoPop()
 				break
 			}
 
 			ctx.Set(0, method.Call(mrb, recv))
-			mrb.PopCallinfo()
+			mrb.callinfoPop()
 		case opString:
 			a := code.ReadB()
 			b := code.ReadB()
@@ -143,7 +143,7 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 	}
 }
 
-func (state *State) PushCallinfo(mid Symbol, pushStack int, argc byte, targetClass *Class) *callinfo {
+func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetClass *Class) *callinfo {
 	ctx := state.context
 	prevCi := ctx.GetCallinfo()
 
@@ -158,7 +158,7 @@ func (state *State) PushCallinfo(mid Symbol, pushStack int, argc byte, targetCla
 	return callinfo
 }
 
-func (state *State) PopCallinfo() {
+func (state *State) callinfoPop() {
 	ctx := state.context
 	ctx.callinfo.Pop()
 }
