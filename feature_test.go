@@ -119,6 +119,21 @@ func (feat *RubyFeature) thereShouldReturnClass(expected string) error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnModule(expected string) error {
+	module, ok := feat.ret.(*mruby.Module)
+
+	if !ok {
+		return fmt.Errorf("expected module, got %T", feat.ret)
+	}
+
+	actual := feat.mrb.ClassName(module)
+	if actual != expected {
+		return fmt.Errorf("expected %s, got %s", expected, actual)
+	}
+
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	mrb, err := mruby.New()
 	if err != nil {
@@ -138,6 +153,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return symbol "([^"]*)"$`, feat.thereShouldReturnSymbol)
 	s.Step(`^there should return object$`, feat.thereShouldReturnObject)
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
+	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
 }
 
 func TestFeatures(t *testing.T) {

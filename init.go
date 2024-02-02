@@ -1,16 +1,17 @@
 package mruby
 
 func initCore(mrb *State) (err error) {
-	err = initClass(mrb)
-	if err != nil {
-		return err
+	if err = initClass(mrb); err != nil {
+		return
 	}
 
-	err = initObject(mrb)
-	if err != nil {
-		return err
+	if err = initObject(mrb); err != nil {
+		return
 	}
-	initKernel(mrb)
 
-	return nil
+	if err = initKernel(mrb); err != nil {
+		return
+	}
+
+	return
 }

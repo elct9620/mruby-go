@@ -23,7 +23,7 @@ type State struct {
 	ClassClass   *Class
 	FalseClass   *Class
 	TrueClass    *Class
-	KernelModule *Module
+	KernelModule RClass
 
 	topSelf *Object
 

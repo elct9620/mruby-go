@@ -6,16 +6,14 @@ type Module struct {
 	class
 }
 
-func (mrb *State) DefineModule(name string) *Module {
-	return newModule(mrb)
+func (mrb *State) DefineModuleId(name Symbol) RClass {
+	return defineModule(mrb, name, mrb.ObjectClass)
 }
 
-func newModule(mrb *State) *Module {
-	return &Module{
-		class: class{
-			super: mrb.ModuleClass,
-			mt:    make(methodTable),
-			iv:    make(ivTable),
-		},
-	}
+func defineModule(mrb *State, name Symbol, outer RClass) *Module {
+	module := mrb.AllocModule()
+	module.mt = make(methodTable)
+	mrb.setupClass(module, outer, name)
+
+	return module
 }

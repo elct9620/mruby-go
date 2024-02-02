@@ -16,6 +16,7 @@ var (
 	_Object      = predefineSymbol("Object")
 	_Module      = predefineSymbol("Module")
 	_Class       = predefineSymbol("Class")
+	_Kernel      = predefineSymbol("Kernel")
 	_TrueClass   = predefineSymbol("TrueClass")
 	_FalseClass  = predefineSymbol("FalseClass")
 )

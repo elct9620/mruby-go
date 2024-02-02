@@ -19,3 +19,13 @@ func (mrb *State) AllocSingletonClass() *SingletonClass {
 		},
 	}
 }
+
+func (mrb *State) AllocModule() *Module {
+	return &Module{
+		class: class{
+			object: object{
+				class: mrb.ModuleClass,
+			},
+		},
+	}
+}
