@@ -37,6 +37,8 @@ type SingletonClass struct {
 
 func (mrb *State) ClassOf(v Value) RClass {
 	switch v.(type) {
+	case RClass:
+		return (v.(RClass)).Class()
 	case RObject:
 		return mrb.ObjectClass
 	case bool:
@@ -215,6 +217,22 @@ func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 	mrb.ObjectInstanceVariableSetForce(class, nsym, name)
 }
 
+func (mrb *State) initClassNew(class RClass) {
+	mrb.DefineMethodId(class, _new(mrb), allocObject)
+}
+
+func allocObject(mrb *State, self Value) Value {
+	args := mrb.GetArgv()
+	argc := mrb.GetArgc()
+
+	super := mrb.ObjectClass
+	if argc > 0 {
+		super = args[0].(*Class)
+	}
+
+	return &Object{object{super}, nil}
+}
+
 func initClass(mrb *State) {
 	basicObject := mrb.bootDefineClass(nil)
 	objectClass := mrb.bootDefineClass(basicObject)
@@ -242,4 +260,6 @@ func initClass(mrb *State) {
 	mrb.nameClass(objectClass, nil, _Object(mrb))
 	mrb.nameClass(moduleClass, nil, _Module(mrb))
 	mrb.nameClass(classClass, nil, _Class(mrb))
+
+	mrb.initClassNew(classClass)
 }

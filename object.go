@@ -49,24 +49,10 @@ func initObject(mrb *State) (err error) {
 		return err
 	}
 
-	mrb.DefineMethodId(mrb.ObjectClass, _new(mrb), objectNew)
-
 	putsSym := mrb.Intern("puts")
 	mrb.DefineMethodId(mrb.ObjectClass, putsSym, objectPuts)
 
 	return nil
-}
-
-func objectNew(mrb *State, recv Value) Value {
-	args := mrb.GetArgv()
-	argc := mrb.GetArgc()
-
-	super := mrb.ObjectClass
-	if argc > 0 {
-		super = args[0].(*Class)
-	}
-
-	return &Object{object{super}, nil}
 }
 
 func objectPuts(mrb *State, recv Value) Value {
