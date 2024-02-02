@@ -233,7 +233,7 @@ func allocObject(mrb *State, self Value) Value {
 	return &Object{object{super}, nil}
 }
 
-func initClass(mrb *State) {
+func initClass(mrb *State) (err error) {
 	basicObject := mrb.bootDefineClass(nil)
 	objectClass := mrb.bootDefineClass(basicObject)
 	mrb.ObjectClass = objectClass
@@ -246,10 +246,25 @@ func initClass(mrb *State) {
 	objectClass.object.class = classClass
 	moduleClass.object.class = classClass
 
-	mrb.prepareSingletonClass(basicObject) // nolint: errcheck
-	mrb.prepareSingletonClass(objectClass) // nolint: errcheck
-	mrb.prepareSingletonClass(moduleClass) // nolint: errcheck
-	mrb.prepareSingletonClass(classClass)  // nolint: errcheck
+	err = mrb.prepareSingletonClass(basicObject)
+	if err != nil {
+		return
+	}
+
+	err = mrb.prepareSingletonClass(objectClass)
+	if err != nil {
+		return
+	}
+
+	err = mrb.prepareSingletonClass(moduleClass)
+	if err != nil {
+		return
+	}
+
+	err = mrb.prepareSingletonClass(classClass)
+	if err != nil {
+		return
+	}
 
 	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
 	mrb.DefineConstById(objectClass, _Object(mrb), NewObjectValue(objectClass))
@@ -262,4 +277,6 @@ func initClass(mrb *State) {
 	mrb.nameClass(classClass, nil, _Class(mrb))
 
 	mrb.initClassNew(classClass)
+
+	return
 }

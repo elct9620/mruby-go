@@ -1,7 +1,11 @@
 package mruby
 
 func initCore(mrb *State) (err error) {
-	initClass(mrb)
+	err = initClass(mrb)
+	if err != nil {
+		return err
+	}
+
 	err = initObject(mrb)
 	if err != nil {
 		return err
