@@ -2,6 +2,8 @@ package mruby
 
 import (
 	"errors"
+
+	"github.com/elct9620/mruby-go/insn"
 )
 
 var ErrUnsupportPoolValueType = errors.New("unsupport pool value type")
@@ -17,13 +19,13 @@ const (
 	poolTypeBigInt = 7
 )
 
-type PoolReader = func(*Reader) (Value, error)
+type PoolReader = func(insn.Reader) (Value, error)
 
 var poolReaders = map[poolType]PoolReader{
 	poolTypeString: poolReadString,
 }
 
-func readPoolValues(mrb *State, ir *iRep, r *Reader) error {
+func readPoolValues(mrb *State, ir *iRep, r insn.Reader) error {
 	pLen, err := r.ReadUint16()
 	if err != nil {
 		return err
@@ -43,7 +45,7 @@ func readPoolValues(mrb *State, ir *iRep, r *Reader) error {
 	return nil
 }
 
-func readPoolValue(r *Reader) (Value, error) {
+func readPoolValue(r insn.Reader) (Value, error) {
 	var pType poolType
 	err := r.ReadAs(&pType)
 	if err != nil {
@@ -58,7 +60,7 @@ func readPoolValue(r *Reader) (Value, error) {
 	return reader(r)
 }
 
-func poolReadString(r *Reader) (Value, error) {
+func poolReadString(r insn.Reader) (Value, error) {
 	sLen, err := r.ReadUint16()
 	if err != nil {
 		return "", err

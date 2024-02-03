@@ -4,7 +4,7 @@ import "github.com/elct9620/mruby-go/insn"
 
 const nullSymbolLength = 0xffff
 
-type iRepReaderFn func(*State, *iRep, *Reader) error
+type iRepReaderFn func(*State, *iRep, insn.Reader) error
 
 var iRepReaders = []iRepReaderFn{
 	readIRepHeader,
@@ -26,7 +26,7 @@ type iRep struct {
 	syms      []Symbol
 }
 
-func newIRep(mrb *State, r *Reader) (*iRep, error) {
+func newIRep(mrb *State, r insn.Reader) (*iRep, error) {
 	iRep := &iRep{}
 
 	for _, loader := range iRepReaders {
@@ -39,7 +39,7 @@ func newIRep(mrb *State, r *Reader) (*iRep, error) {
 	return iRep, nil
 }
 
-func readIRepHeader(mrb *State, ir *iRep, r *Reader) (err error) {
+func readIRepHeader(mrb *State, ir *iRep, r insn.Reader) (err error) {
 	fields := []any{
 		&ir.nLocals,
 		&ir.nRegs,
@@ -58,7 +58,7 @@ func readIRepHeader(mrb *State, ir *iRep, r *Reader) (err error) {
 	return nil
 }
 
-func readISeq(mrb *State, ir *iRep, r *Reader) error {
+func readISeq(mrb *State, ir *iRep, r insn.Reader) error {
 	binary := make([]byte, ir.iLen)
 	err := r.ReadAs(binary)
 	if err != nil {
@@ -69,7 +69,7 @@ func readISeq(mrb *State, ir *iRep, r *Reader) error {
 	return nil
 }
 
-func readSyms(mrb *State, ir *iRep, r *Reader) error {
+func readSyms(mrb *State, ir *iRep, r insn.Reader) error {
 	err := r.ReadAs(&ir.sLen)
 	if err != nil {
 		return err

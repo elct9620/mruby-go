@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+
+	"github.com/elct9620/mruby-go/insn"
 )
 
 var (
@@ -97,7 +99,9 @@ func readSectionIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
 	}
 
 	sizeStripped := binary[4:]
-	return newIRep(mrb, NewBytesReader(sizeStripped))
+
+	reader := insn.NewBinaryReader(bytes.NewReader(sizeStripped))
+	return newIRep(mrb, reader)
 }
 
 func noopSection(r io.Reader, size uint32) error {
