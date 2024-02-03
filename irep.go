@@ -49,7 +49,7 @@ func readIRepHeader(mrb *State, ir *iRep, r insn.Reader) (err error) {
 	}
 
 	for _, field := range fields {
-		err = r.ReadAs(field)
+		err = r.As(field)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func readIRepHeader(mrb *State, ir *iRep, r insn.Reader) (err error) {
 
 func readISeq(mrb *State, ir *iRep, r insn.Reader) error {
 	binary := make([]byte, ir.iLen)
-	err := r.ReadAs(binary)
+	err := r.As(binary)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func readISeq(mrb *State, ir *iRep, r insn.Reader) error {
 }
 
 func readSyms(mrb *State, ir *iRep, r insn.Reader) error {
-	err := r.ReadAs(&ir.sLen)
+	err := r.As(&ir.sLen)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func readSyms(mrb *State, ir *iRep, r insn.Reader) error {
 	ir.syms = make([]Symbol, ir.sLen)
 
 	for i := uint16(0); i < ir.sLen; i++ {
-		strLen, err := r.ReadUint16()
+		strLen, err := r.Uint16()
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func readSyms(mrb *State, ir *iRep, r insn.Reader) error {
 			continue
 		}
 
-		str, err := r.ReadString(int(strLen) + 1)
+		str, err := r.String(int(strLen) + 1)
 		if err != nil {
 			return err
 		}

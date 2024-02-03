@@ -9,9 +9,9 @@ var DefaultBinaryOrder = binary.BigEndian
 
 type Reader interface {
 	io.Reader
-	ReadAs(any) error
-	ReadUint16() (uint16, error)
-	ReadString(int) (string, error)
+	As(any) error
+	Uint16() (uint16, error)
+	String(int) (string, error)
 }
 
 type BinaryReader struct {
@@ -25,19 +25,19 @@ func NewBinaryReader(r io.Reader) *BinaryReader {
 	return &BinaryReader{r, DefaultBinaryOrder}
 }
 
-func (r *BinaryReader) ReadAs(data any) error {
+func (r *BinaryReader) As(data any) error {
 	return binary.Read(r, r.ByteOrder, data)
 }
 
-func (r *BinaryReader) ReadUint16() (uint16, error) {
+func (r *BinaryReader) Uint16() (uint16, error) {
 	var v uint16
-	err := r.ReadAs(&v)
+	err := r.As(&v)
 	return v, err
 }
 
-func (r *BinaryReader) ReadString(length int) (string, error) {
+func (r *BinaryReader) String(length int) (string, error) {
 	buf := make([]byte, length)
-	err := r.ReadAs(buf)
+	err := r.As(buf)
 	if err != nil {
 		return "", err
 	}

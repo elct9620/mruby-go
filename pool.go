@@ -26,7 +26,7 @@ var poolReaders = map[poolType]PoolReader{
 }
 
 func readPoolValues(mrb *State, ir *iRep, r insn.Reader) error {
-	pLen, err := r.ReadUint16()
+	pLen, err := r.Uint16()
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func readPoolValues(mrb *State, ir *iRep, r insn.Reader) error {
 
 func readPoolValue(r insn.Reader) (Value, error) {
 	var pType poolType
-	err := r.ReadAs(&pType)
+	err := r.As(&pType)
 	if err != nil {
 		return nil, err
 	}
@@ -61,10 +61,10 @@ func readPoolValue(r insn.Reader) (Value, error) {
 }
 
 func poolReadString(r insn.Reader) (Value, error) {
-	sLen, err := r.ReadUint16()
+	sLen, err := r.Uint16()
 	if err != nil {
 		return "", err
 	}
 
-	return r.ReadString(int(sLen + 1))
+	return r.String(int(sLen + 1))
 }
