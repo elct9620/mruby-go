@@ -1,0 +1,124 @@
+package insn
+
+type State interface {
+	Intern(string) uint32
+}
+
+type loadRepresentationFn func(State, *Representation, Reader) error
+
+type Representation struct {
+	nLocals   uint16
+	nRegs     uint16
+	rLen      uint16
+	cLen      uint16
+	iLen      uint32
+	pLen      uint16
+	sLen      uint16
+	iSeq      *Sequence
+	poolValue []any
+	syms      []uint32
+}
+
+func NewRepresentation(mrb State, r Reader) (*Representation, error) {
+	var rep = &Representation{}
+
+	for _, fn := range []loadRepresentationFn{
+		loadHeader,
+		loadSequence,
+		loadPool,
+		loadSyms,
+	} {
+		if err := fn(mrb, rep, r); err != nil {
+			return nil, err
+		}
+	}
+
+	return rep, nil
+}
+
+func (rep *Representation) Sequence() *Sequence {
+	return rep.iSeq
+}
+
+func (rep *Representation) Symbol(i uint8) uint32 {
+	return rep.syms[i]
+}
+
+func (rep *Representation) PoolValue(i uint8) any {
+	return rep.poolValue[i]
+}
+
+func loadHeader(mrb State, rep *Representation, r Reader) error {
+	fields := []any{
+		&rep.nLocals,
+		&rep.nRegs,
+		&rep.rLen,
+		&rep.cLen,
+	}
+
+	for _, field := range fields {
+		if err := r.As(field); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func loadSequence(mrb State, rep *Representation, r Reader) error {
+	if err := r.As(&rep.iLen); err != nil {
+		return err
+	}
+
+	binary := make([]byte, rep.iLen)
+	if err := r.As(binary); err != nil {
+		return err
+	}
+
+	rep.iSeq = NewSequence(binary)
+	return nil
+}
+
+func loadPool(mrb State, rep *Representation, r Reader) error {
+	pLen, err := r.Uint16()
+	if err != nil {
+		return err
+	}
+
+	rep.poolValue = make([]any, pLen)
+
+	for i := uint16(0); i < pLen; i++ {
+		rep.poolValue[i], err = readPool(r)
+		if err != nil {
+			return err
+		}
+
+		rep.pLen = uint16(i + 1)
+	}
+
+	return nil
+}
+
+func loadSyms(mrb State, rep *Representation, r Reader) error {
+	if err := r.As(&rep.sLen); err != nil {
+		return err
+	}
+
+	rep.syms = make([]uint32, rep.sLen)
+
+	for i := uint16(0); i < rep.sLen; i++ {
+		symbol, err := r.String()
+		if err != nil {
+			return err
+		}
+
+		if len(symbol) == 0 {
+			rep.syms[i] = 0
+			continue
+		}
+
+		rep.syms[i] = mrb.Intern(symbol)
+	}
+
+	return nil
+}

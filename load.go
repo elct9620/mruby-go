@@ -40,7 +40,7 @@ func readIRep(mrb *State, r io.Reader) (RProc, error) {
 		return nil, err
 	}
 
-	var irep *iRep
+	var irep *insn.Representation
 
 	remain := header.Size - binaryHeaderSize
 	for remain > sectionHeaderSize {
@@ -84,7 +84,7 @@ func readSectionHeader(r io.Reader, remain uint32) (*sectionHeader, error) {
 	return &header, nil
 }
 
-func readSectionIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
+func readSectionIRep(mrb *State, r io.Reader, size uint32) (*insn.Representation, error) {
 	var riteVersion [4]byte
 	err := binaryRead(r, &riteVersion)
 	if err != nil {
@@ -101,7 +101,7 @@ func readSectionIRep(mrb *State, r io.Reader, size uint32) (*iRep, error) {
 	sizeStripped := binary[4:]
 
 	reader := insn.NewBinaryReader(bytes.NewReader(sizeStripped))
-	return newIRep(mrb, reader)
+	return insn.NewRepresentation(mrb, reader)
 }
 
 func noopSection(r io.Reader, size uint32) error {

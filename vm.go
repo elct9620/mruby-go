@@ -20,7 +20,7 @@ func (mrb *State) TopRun(proc RProc, self Value) (Value, error) {
 }
 
 func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
-	ir, ok := proc.Body().(*iRep)
+	irep, ok := proc.Body().(*insn.Representation)
 	if !ok {
 		return nil, ErrIRepNotFound
 	}
@@ -31,11 +31,11 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 
 	mrb.context.stack[0] = mrb.topSelf
 
-	return mrb.VmExec(proc, ir.iSeq.Clone())
+	return mrb.VmExec(proc, irep.Sequence().Clone())
 }
 
 func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
-	ir, ok := proc.Body().(*iRep)
+	rep, ok := proc.Body().(*insn.Representation)
 	if !ok {
 		return nil, ErrIRepNotFound
 	}
@@ -73,18 +73,18 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 		case op.LoadSym:
 			a := code.ReadB()
 			b := code.ReadB()
-			ctx.Set(int(a), ir.syms[b])
+			ctx.Set(int(a), rep.Symbol(b))
 		case op.LoadNil:
 			a := code.ReadB()
 			ctx.Set(int(a), nil)
 		case op.GetConst:
 			a := code.ReadB()
 			b := code.ReadB()
-			ctx.Set(int(a), mrb.VmGetConst(ir.syms[b]))
+			ctx.Set(int(a), mrb.VmGetConst(rep.Symbol(b)))
 		case op.SetConst:
 			a := code.ReadB()
 			b := code.ReadB()
-			mrb.VmSetConst(ir.syms[b], ctx.Get(int(a)))
+			mrb.VmSetConst(rep.Symbol(b), ctx.Get(int(a)))
 		case op.SelfSend, op.Send, op.SendB:
 			a := code.ReadB()
 			b := code.ReadB()
@@ -95,7 +95,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 				opCode = op.Send //nolint:ineffassign
 			}
 
-			mid := ir.syms[b]
+			mid := rep.Symbol(b)
 
 			ci := mrb.callinfoPush(mid, int(a), c, nil)
 			recv := ctx.Get(0)
@@ -115,7 +115,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			a := code.ReadB()
 			b := code.ReadB()
 
-			ctx.Set(int(a), ir.poolValue[b])
+			ctx.Set(int(a), rep.PoolValue(b))
 		case op.Return:
 			a := code.ReadB()
 			return ctx.Get(int(a)), nil
@@ -128,7 +128,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 
 			base := ctx.Get(int(a))
 			super := ctx.Get(int(a) + 1)
-			id := ir.syms[b]
+			id := rep.Symbol(b)
 
 			if base == nil {
 				base = mrb.ObjectClass
