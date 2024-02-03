@@ -59,6 +59,16 @@ func Test_Reader_String(t *testing.T) {
 	}
 }
 
+func Test_Reader_String_Length_Invalid(t *testing.T) {
+	data := []byte{0x00}
+	reader := insn.NewBinaryReader(bytes.NewReader(data))
+
+	_, err := reader.String()
+	if err == nil {
+		t.Errorf("Read String failed: expected error, got nil")
+	}
+}
+
 func Test_Reader_String_Invalid(t *testing.T) {
 	data := []byte{0x00, 0x03, 'a', 'b'}
 	reader := insn.NewBinaryReader(bytes.NewReader(data))
