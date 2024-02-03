@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elct9620/mruby-go/insn"
 	"github.com/elct9620/mruby-go/op"
 )
 
@@ -33,7 +34,7 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 	return mrb.VmExec(proc, ir.iSeq.Clone())
 }
 
-func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
+func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 	ir, ok := proc.Body().(*iRep)
 	if !ok {
 		return nil, ErrIRepNotFound
@@ -42,7 +43,7 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 	ctx := mrb.context
 
 	for {
-		opCode := code.Next()
+		opCode := code.Operation()
 
 		switch opCode {
 		case op.Move:

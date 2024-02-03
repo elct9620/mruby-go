@@ -1,5 +1,7 @@
 package mruby
 
+import "github.com/elct9620/mruby-go/insn"
+
 const nullSymbolLength = 0xffff
 
 type iRepReaderFn func(*State, *iRep, *Reader) error
@@ -19,7 +21,7 @@ type iRep struct {
 	iLen      uint32
 	pLen      uint16
 	sLen      uint16
-	iSeq      *Code
+	iSeq      *insn.Sequence
 	poolValue []Value
 	syms      []Symbol
 }
@@ -63,7 +65,7 @@ func readISeq(mrb *State, ir *iRep, r *Reader) error {
 		return err
 	}
 
-	ir.iSeq = NewCode(binary)
+	ir.iSeq = insn.NewSequence(binary)
 	return nil
 }
 
