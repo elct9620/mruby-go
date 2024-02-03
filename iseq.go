@@ -1,5 +1,7 @@
 package mruby
 
+import "github.com/elct9620/mruby-go/op"
+
 // mrb_code aka iseq
 type Code struct {
 	binary []byte
@@ -10,7 +12,7 @@ func NewCode(bytes []byte) *Code {
 	return &Code{binary: bytes, cursor: 0}
 }
 
-func (code *Code) Next() opCode {
+func (code *Code) Next() op.Code {
 	return code.ReadB()
 }
 

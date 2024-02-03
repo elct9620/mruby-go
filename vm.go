@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
+	"github.com/elct9620/mruby-go/op"
 )
 
 var (
@@ -43,53 +45,53 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 		opCode := code.Next()
 
 		switch opCode {
-		case opMove:
+		case op.Move:
 			ctx.Set(int(code.ReadB()), ctx.Get(int(code.ReadB())))
-		case opLoadI:
+		case op.LoadI:
 			a := code.ReadB()
 			b := code.ReadB()
 			ctx.Set(int(a), int(b))
-		case opLoadINeg:
+		case op.LoadINeg:
 			a := code.ReadB()
 			b := code.ReadB()
 			ctx.Set(int(a), -int(b))
-		case opLoadI__1, opLoadI_0, opLoadI_1, opLoadI_2, opLoadI_3, opLoadI_4, opLoadI_5, opLoadI_6, opLoadI_7:
+		case op.LoadI__1, op.LoadI_0, op.LoadI_1, op.LoadI_2, op.LoadI_3, op.LoadI_4, op.LoadI_5, op.LoadI_6, op.LoadI_7:
 			a := code.ReadB()
-			ctx.Set(int(a), int(opCode)-int(opLoadI_0))
-		case opLoadT, opLoadF:
+			ctx.Set(int(a), int(opCode)-int(op.LoadI_0))
+		case op.LoadT, op.LoadF:
 			a := code.ReadB()
-			ctx.Set(int(a), opCode == opLoadT)
-		case opLoadI16:
+			ctx.Set(int(a), opCode == op.LoadT)
+		case op.LoadI16:
 			a := code.ReadB()
 			b := code.ReadS()
 			ctx.Set(int(a), int(int16(binary.BigEndian.Uint16(b))))
-		case opLoadI32:
+		case op.LoadI32:
 			a := code.ReadB()
 			b := code.ReadW()
 			ctx.Set(int(a), int(int32(binary.BigEndian.Uint32(b))))
-		case opLoadSym:
+		case op.LoadSym:
 			a := code.ReadB()
 			b := code.ReadB()
 			ctx.Set(int(a), ir.syms[b])
-		case opLoadNil:
+		case op.LoadNil:
 			a := code.ReadB()
 			ctx.Set(int(a), nil)
-		case opGetConst:
+		case op.GetConst:
 			a := code.ReadB()
 			b := code.ReadB()
 			ctx.Set(int(a), mrb.VmGetConst(ir.syms[b]))
-		case opSetConst:
+		case op.SetConst:
 			a := code.ReadB()
 			b := code.ReadB()
 			mrb.VmSetConst(ir.syms[b], ctx.Get(int(a)))
-		case opSelfSend, opSend, opSendB:
+		case op.SelfSend, op.Send, op.SendB:
 			a := code.ReadB()
 			b := code.ReadB()
 			c := code.ReadB()
 
-			if opCode == opSelfSend {
+			if opCode == op.SelfSend {
 				ctx.Set(int(a), ctx.Get(0))
-				opCode = opSend //nolint:ineffassign
+				opCode = op.Send //nolint:ineffassign
 			}
 
 			mid := ir.syms[b]
@@ -108,18 +110,18 @@ func (mrb *State) VmExec(proc RProc, code *Code) (Value, error) {
 
 			ctx.Set(0, method.Call(mrb, recv))
 			mrb.callinfoPop()
-		case opString:
+		case op.String:
 			a := code.ReadB()
 			b := code.ReadB()
 
 			ctx.Set(int(a), ir.poolValue[b])
-		case opReturn:
+		case op.Return:
 			a := code.ReadB()
 			return ctx.Get(int(a)), nil
-		case opStrCat:
+		case op.StrCat:
 			a := code.ReadB()
 			ctx.Set(int(a), fmt.Sprintf("%v%v", ctx.Get(int(a)), ctx.Get(int(a)+1)))
-		case opClass:
+		case op.Class:
 			a := code.ReadB()
 			b := code.ReadB()
 
