@@ -61,10 +61,5 @@ func readPoolValue(r insn.Reader) (Value, error) {
 }
 
 func poolReadString(r insn.Reader) (Value, error) {
-	sLen, err := r.Uint16()
-	if err != nil {
-		return "", err
-	}
-
-	return r.String(int(sLen + 1))
+	return r.String()
 }

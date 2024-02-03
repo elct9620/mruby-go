@@ -11,7 +11,7 @@ type Reader interface {
 	io.Reader
 	As(any) error
 	Uint16() (uint16, error)
-	String(int) (string, error)
+	String() (string, error)
 }
 
 type BinaryReader struct {
@@ -35,12 +35,17 @@ func (r *BinaryReader) Uint16() (uint16, error) {
 	return v, err
 }
 
-func (r *BinaryReader) String(length int) (string, error) {
-	buf := make([]byte, length)
-	err := r.As(buf)
+func (r *BinaryReader) String() (string, error) {
+	sLen, err := r.Uint16()
 	if err != nil {
 		return "", err
 	}
 
-	return string(buf[0 : length-1]), nil
+	buf := make([]byte, sLen+1)
+	err = r.As(buf)
+	if err != nil {
+		return "", err
+	}
+
+	return string(buf[0:sLen]), nil
 }

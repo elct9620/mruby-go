@@ -2,8 +2,6 @@ package mruby
 
 import "github.com/elct9620/mruby-go/insn"
 
-const nullSymbolLength = 0xffff
-
 type iRepReaderFn func(*State, *iRep, insn.Reader) error
 
 var iRepReaders = []iRepReaderFn{
@@ -78,22 +76,17 @@ func readSyms(mrb *State, ir *iRep, r insn.Reader) error {
 	ir.syms = make([]Symbol, ir.sLen)
 
 	for i := uint16(0); i < ir.sLen; i++ {
-		strLen, err := r.Uint16()
+		symbol, err := r.String()
 		if err != nil {
 			return err
 		}
 
-		if strLen == nullSymbolLength {
+		if len(symbol) == 0 {
 			ir.syms[i] = 0
 			continue
 		}
 
-		str, err := r.String(int(strLen) + 1)
-		if err != nil {
-			return err
-		}
-
-		ir.syms[i] = mrb.Intern(string(str))
+		ir.syms[i] = mrb.Intern(symbol)
 	}
 
 	return nil
