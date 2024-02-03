@@ -246,24 +246,11 @@ func initClass(mrb *State) (err error) {
 	objectClass.object.class = classClass
 	moduleClass.object.class = classClass
 
-	err = mrb.prepareSingletonClass(basicObject)
-	if err != nil {
-		return
-	}
-
-	err = mrb.prepareSingletonClass(objectClass)
-	if err != nil {
-		return
-	}
-
-	err = mrb.prepareSingletonClass(moduleClass)
-	if err != nil {
-		return
-	}
-
-	err = mrb.prepareSingletonClass(classClass)
-	if err != nil {
-		return
+	for _, class := range []RClass{basicObject, objectClass, moduleClass, classClass} {
+		err = mrb.prepareSingletonClass(class)
+		if err != nil {
+			return
+		}
 	}
 
 	mrb.DefineConstById(basicObject, _BasicObject(mrb), NewObjectValue(basicObject))
