@@ -1,7 +1,10 @@
 package insn
 
+type Symbol = uint32
+type Value = any
+
 type State interface {
-	Intern(string) uint32
+	Intern(string) Symbol
 }
 
 type loadRepresentationFn func(State, *Representation, Reader) error
@@ -15,8 +18,8 @@ type Representation struct {
 	pLen      uint16
 	sLen      uint16
 	iSeq      *Sequence
-	poolValue []any
-	syms      []uint32
+	poolValue []Value
+	syms      []Symbol
 }
 
 func NewRepresentation(mrb State, r Reader) (*Representation, error) {
@@ -40,11 +43,11 @@ func (rep *Representation) Sequence() *Sequence {
 	return rep.iSeq
 }
 
-func (rep *Representation) Symbol(i uint8) uint32 {
+func (rep *Representation) Symbol(i uint8) Symbol {
 	return rep.syms[i]
 }
 
-func (rep *Representation) PoolValue(i uint8) any {
+func (rep *Representation) PoolValue(i uint8) Value {
 	return rep.poolValue[i]
 }
 
@@ -104,7 +107,7 @@ func loadSyms(mrb State, rep *Representation, r Reader) error {
 		return err
 	}
 
-	rep.syms = make([]uint32, rep.sLen)
+	rep.syms = make([]Symbol, rep.sLen)
 
 	for i := uint16(0); i < rep.sLen; i++ {
 		symbol, err := r.String()

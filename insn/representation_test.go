@@ -9,7 +9,7 @@ import (
 
 type mockState struct {
 	symCount uint32
-	symTable map[string]uint32
+	symTable map[string]insn.Symbol
 }
 
 func newMockState() *mockState {
