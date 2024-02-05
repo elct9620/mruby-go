@@ -1,10 +1,20 @@
 package mruby
 
-import "github.com/elct9620/mruby-go/stack"
+type CallinfoStack interface {
+	Push(*callinfo)
+	Pop() *callinfo
+	Peek() *callinfo
+}
+
+type ContextStack interface {
+	Get(int) Value
+	Slice(int, int) []Value
+	Set(int, Value)
+}
 
 type context struct {
-	stack    *stack.Stack[Value]
-	callinfo *stack.Stack[*callinfo]
+	stack    ContextStack
+	callinfo CallinfoStack
 }
 
 func (ctx *context) GetCallinfo() *callinfo {
