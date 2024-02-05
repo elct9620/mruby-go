@@ -8,7 +8,7 @@ type Stack[T any] struct {
 
 func New[T any](size int) *Stack[T] {
 	return &Stack[T]{
-		current:  0,
+		current:  -1,
 		end:      size,
 		elements: make([]T, size),
 	}
@@ -40,5 +40,39 @@ func (s *Stack[T]) Pop() T {
 }
 
 func (s *Stack[T]) Peek() T {
+	if s.current == -1 {
+		var empty T
+		return empty
+	}
+
 	return s.elements[s.current]
+}
+
+func (s *Stack[T]) Slice(start, end int) []T {
+	if start < 0 {
+		start = 0
+	}
+
+	if end > s.end {
+		end = s.end
+	}
+
+	return s.elements[start:end]
+}
+
+func (s *Stack[T]) Get(idx int) T {
+	if idx < 0 || idx > s.end {
+		var empty T
+		return empty
+	}
+
+	return s.elements[idx]
+}
+
+func (s *Stack[T]) Set(idx int, v T) {
+	if idx < 0 || idx > s.end {
+		return
+	}
+
+	s.elements[idx] = v
 }

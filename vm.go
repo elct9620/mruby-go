@@ -7,6 +7,7 @@ import (
 
 	"github.com/elct9620/mruby-go/insn"
 	"github.com/elct9620/mruby-go/op"
+	"github.com/elct9620/mruby-go/stack"
 )
 
 var (
@@ -26,10 +27,10 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 	}
 
 	if mrb.context.stack == nil {
-		mrb.context.stack = make([]Value, StackInitSize)
+		mrb.context.stack = stack.New[Value](StackInitSize)
 	}
 
-	mrb.context.stack[0] = mrb.topSelf
+	mrb.context.Set(0, mrb.topSelf)
 
 	return mrb.VmExec(proc, irep.Sequence().Clone())
 }

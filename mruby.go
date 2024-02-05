@@ -6,6 +6,7 @@ import (
 
 const (
 	CallinfoInitSize = 32
+	StackInitSize    = 128
 )
 
 type (
