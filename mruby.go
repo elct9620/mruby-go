@@ -4,6 +4,10 @@ import (
 	"github.com/elct9620/mruby-go/stack"
 )
 
+const (
+	CallinfoInitSize = 32
+)
+
 type (
 	Value = any
 )
@@ -34,7 +38,7 @@ type State struct {
 func New() (*State, error) {
 	state := &State{
 		context: &context{
-			callinfo: stack.New[*callinfo](),
+			callinfo: stack.New[*callinfo](CallinfoInitSize),
 		},
 		topSelf:     &Object{},
 		symbolTable: make(map[string]Symbol),

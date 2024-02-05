@@ -14,7 +14,7 @@ var (
 )
 
 func (mrb *State) TopRun(proc RProc, self Value) (Value, error) {
-	mrb.context.callinfo.Push(&callinfo{})
+	mrb.callinfoPush(0, 0, 0, mrb.ObjectClass)
 
 	return mrb.VmRun(proc, self)
 }
@@ -149,6 +149,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetClass *Class) *callinfo {
 	ctx := state.context
 	prevCi := ctx.GetCallinfo()
+
+	if prevCi == nil {
+		prevCi = &callinfo{}
+	}
 
 	callinfo := &callinfo{
 		methodId:    mid,
