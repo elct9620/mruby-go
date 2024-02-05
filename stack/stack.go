@@ -10,7 +10,7 @@ func New[T any](size int) *Stack[T] {
 	return &Stack[T]{
 		current:  0,
 		end:      size,
-		elements: make([]T, size, size),
+		elements: make([]T, size),
 	}
 }
 
@@ -41,25 +41,4 @@ func (s *Stack[T]) Pop() T {
 
 func (s *Stack[T]) Peek() T {
 	return s.elements[s.current]
-}
-
-func (s *Stack[T]) Len() int {
-	return s.end
-}
-
-func (s *Stack[T]) Get(idx int) T {
-	var empty T
-	if idx < 0 || idx >= s.end {
-		return empty
-	}
-
-	return s.elements[idx]
-}
-
-func (s *Stack[T]) Set(idx int, v T) {
-	if idx < 0 || idx >= s.end {
-		return
-	}
-
-	s.elements[idx] = v
 }
