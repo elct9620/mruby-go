@@ -141,6 +141,9 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			}
 
 			ctx.Set(int(a), NewObjectValue(class))
+		case op.TClass:
+			a := code.ReadB()
+			ctx.Set(int(a), mrb.context.GetCallinfo().TargetClass())
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}

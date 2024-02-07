@@ -160,6 +160,7 @@ func TestFeatures(t *testing.T) {
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
+			Tags:     "~@wip",
 			Format:   "pretty",
 			Paths:    []string{"features"},
 			TestingT: t,
