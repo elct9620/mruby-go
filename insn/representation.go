@@ -20,6 +20,7 @@ type Representation struct {
 	iSeq      *Sequence
 	poolValue []Value
 	syms      []Symbol
+	reps      []*Representation
 }
 
 func NewRepresentation(mrb State, r Reader) (*Representation, error) {
@@ -30,6 +31,7 @@ func NewRepresentation(mrb State, r Reader) (*Representation, error) {
 		loadSequence,
 		loadPool,
 		loadSyms,
+		loadReps,
 	} {
 		if err := fn(mrb, rep, r); err != nil {
 			return nil, err
@@ -49,6 +51,10 @@ func (rep *Representation) Symbol(i uint8) Symbol {
 
 func (rep *Representation) PoolValue(i uint8) Value {
 	return rep.poolValue[i]
+}
+
+func (rep *Representation) Representation(i uint8) *Representation {
+	return rep.reps[i]
 }
 
 func loadHeader(mrb State, rep *Representation, r Reader) error {
@@ -124,4 +130,22 @@ func loadSyms(mrb State, rep *Representation, r Reader) error {
 	}
 
 	return nil
+}
+
+func loadReps(mrb State, rep *Representation, r Reader) (err error) {
+	rep.reps = make([]*Representation, rep.rLen)
+
+	for i := uint16(0); i < rep.rLen; i++ {
+		var size uint32
+		if err = r.As(&size); err != nil {
+			return
+		}
+
+		rep.reps[i], err = NewRepresentation(mrb, r)
+		if err != nil {
+			return
+		}
+	}
+
+	return
 }

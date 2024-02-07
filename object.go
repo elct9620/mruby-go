@@ -6,12 +6,17 @@ type object struct {
 	class RClass
 }
 
-type RObject interface {
+type RBasic interface {
 	Class() RClass
+}
+
+type RObject interface {
+	RBasic
 	ivPut(Symbol, Value)
 	ivGet(Symbol) Value
 }
 
+var _ RBasic = &Object{}
 var _ RObject = &Object{}
 
 type Object struct {
