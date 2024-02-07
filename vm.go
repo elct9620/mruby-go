@@ -149,6 +149,18 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			nproc := mrb.procNew(nirep)
 
 			ctx.Set(int(a), NewObjectValue(nproc))
+		case op.Def:
+			a := code.ReadB()
+			b := code.ReadB()
+
+			targetClass := ctx.Get(int(a)).(RClass)
+			methodProc := ctx.Get(int(a) + 1).(RProc)
+			mid := rep.Symbol(b)
+
+			method := newMethodFromProc(methodProc)
+			mrb.defineMethodRaw(targetClass, mid, method)
+
+			ctx.Set(int(a), mid)
 		case op.TClass:
 			a := code.ReadB()
 			ctx.Set(int(a), mrb.context.GetCallinfo().TargetClass())

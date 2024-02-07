@@ -19,8 +19,14 @@ func (p *proc) Body() any {
 }
 
 func newMethodFromFunc(function Function) Method {
-	return &goMethod{
+	return &method{
 		Function: function,
+	}
+}
+
+func newMethodFromProc(proc RProc) Method {
+	return &method{
+		RProc: proc,
 	}
 }
 

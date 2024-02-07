@@ -6,12 +6,13 @@ type Method interface {
 	Call(*State, Value) Value
 }
 
-var _ Method = &goMethod{}
+var _ Method = &method{}
 
-type goMethod struct {
+type method struct {
 	Function
+	RProc
 }
 
-func (m *goMethod) Call(mrb *State, self Value) Value {
+func (m *method) Call(mrb *State, self Value) Value {
 	return m.Function(mrb, self)
 }
