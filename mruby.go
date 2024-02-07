@@ -13,13 +13,6 @@ type (
 	Value = any
 )
 
-type callinfo struct {
-	numArgs     int
-	methodId    Symbol
-	stackOffset int
-	targetClass RClass
-}
-
 type State struct {
 	context *context
 
