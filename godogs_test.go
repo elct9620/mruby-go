@@ -1,6 +1,7 @@
 package mruby_test
 
 import (
+	"flag"
 	"fmt"
 	"testing"
 
@@ -8,6 +9,12 @@ import (
 	"github.com/elct9620/mruby-go"
 	"github.com/google/go-cmp/cmp"
 )
+
+var opts = godog.Options{
+	Tags:   "~@wip",
+	Format: "pretty",
+	Paths:  []string{"features"},
+}
 
 const SuiteSuccessCode = 0
 
@@ -156,15 +163,17 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
 }
 
+func init() {
+	godog.BindFlags("godog.", flag.CommandLine, &opts)
+}
+
 func TestFeatures(t *testing.T) {
+	o := opts
+	o.TestingT = t
+
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,
-		Options: &godog.Options{
-			Tags:     "~@wip",
-			Format:   "pretty",
-			Paths:    []string{"features"},
-			TestingT: t,
-		},
+		Options:             &o,
 	}
 
 	if suite.Run() != SuiteSuccessCode {
