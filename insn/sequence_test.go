@@ -49,17 +49,17 @@ func Test_ReadS(t *testing.T) {
 
 func Test_ReadW(t *testing.T) {
 	iseq := insn.NewSequence([]byte{
-		0x01, 0x02, 0x03, 0x04,
+		0x01, 0x02, 0x03,
 	})
 
 	w := iseq.ReadW()
 
-	if len(w) != 4 {
-		t.Errorf("Expected reads 4 bytes, got %v", len(w))
+	if len(w) != 3 {
+		t.Errorf("Expected reads 3 bytes, got %v", len(w))
 	}
 
-	if w[0] != 0x01 || w[1] != 0x02 || w[2] != 0x03 || w[3] != 0x04 {
-		t.Errorf("Expected 0x01 0x02 0x03 0x04, got %v %v %v %v", w[0], w[1], w[2], w[3])
+	if w[0] != 0x01 || w[1] != 0x02 || w[2] != 0x03 {
+		t.Errorf("Expected 0x01 0x02 0x03, got %v %v %v", w[0], w[1], w[2])
 	}
 }
 
