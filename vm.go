@@ -69,8 +69,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			ctx.Set(int(a), int(int16(binary.BigEndian.Uint16(b))))
 		case op.LoadI32:
 			a := code.ReadB()
-			b := code.ReadW()
-			ctx.Set(int(a), int(int32(binary.BigEndian.Uint32(b))))
+			b := code.ReadS()
+			c := code.ReadS()
+			v := append(b, c...)
+			ctx.Set(int(a), int(int32(binary.BigEndian.Uint32(v))))
 		case op.LoadSym:
 			a := code.ReadB()
 			b := code.ReadB()
@@ -112,6 +114,8 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 
 			ctx.Set(0, method.Call(mrb, recv))
 			mrb.callinfoPop()
+		case op.Enter:
+			_ = code.ReadW()
 		case op.String:
 			a := code.ReadB()
 			b := code.ReadB()

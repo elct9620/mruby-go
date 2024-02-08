@@ -30,10 +30,10 @@ func (s *Sequence) ReadS() []byte {
 	return b
 }
 
-// ReadW reads 4 bytes from the sequence and advances the cursor.
+// ReadW reads 3 bytes from the sequence and advances the cursor.
 func (s *Sequence) ReadW() []byte {
-	b := s.code[s.cursor : s.cursor+4]
-	s.cursor += 4
+	b := s.code[s.cursor : s.cursor+3]
+	s.cursor += 3
 	return b
 }
 
