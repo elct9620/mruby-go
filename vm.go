@@ -116,6 +116,41 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			mrb.callinfoPop()
 		case op.Enter:
 			_ = code.ReadW()
+		case op.EQ:
+			a := code.ReadB()
+
+			val1 := ctx.Get(int(a))
+			val2 := ctx.Get(int(a) + 1)
+
+			ctx.Set(int(a), val1 == val2)
+		case op.LT:
+			a := code.ReadB()
+
+			val1 := ctx.Get(int(a))
+			val2 := ctx.Get(int(a) + 1)
+
+			ctx.Set(int(a), val1.(int) < val2.(int))
+		case op.LE:
+			a := code.ReadB()
+
+			val1 := ctx.Get(int(a))
+			val2 := ctx.Get(int(a) + 1)
+
+			ctx.Set(int(a), val1.(int) <= val2.(int))
+		case op.GT:
+			a := code.ReadB()
+
+			val1 := ctx.Get(int(a))
+			val2 := ctx.Get(int(a) + 1)
+
+			ctx.Set(int(a), val1.(int) > val2.(int))
+		case op.GE:
+			a := code.ReadB()
+
+			val1 := ctx.Get(int(a))
+			val2 := ctx.Get(int(a) + 1)
+
+			ctx.Set(int(a), val1.(int) >= val2.(int))
 		case op.String:
 			a := code.ReadB()
 			b := code.ReadB()
