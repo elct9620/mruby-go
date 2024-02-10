@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	ErrIRepNotFound = errors.New("irep not found")
+	ErrIRepNotFound               = errors.New("irep not found")
+	ErrNotPrimitiveTypeComparison = errors.New("not primitive type comparison")
 )
 
 func (mrb *State) TopRun(proc RProc, self Value) (Value, error) {
@@ -123,34 +124,15 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			val2 := ctx.Get(int(a) + 1)
 
 			ctx.Set(int(a), val1 == val2)
-		case op.LT:
+		case op.LT, op.LE, op.GT, op.GE:
 			a := code.ReadB()
 
-			val1 := ctx.Get(int(a))
-			val2 := ctx.Get(int(a) + 1)
+			res, err := opCompare(ctx, int(a), int(a)+1, opCode)
+			if err != nil {
+				return nil, err
+			}
 
-			ctx.Set(int(a), val1.(int) < val2.(int))
-		case op.LE:
-			a := code.ReadB()
-
-			val1 := ctx.Get(int(a))
-			val2 := ctx.Get(int(a) + 1)
-
-			ctx.Set(int(a), val1.(int) <= val2.(int))
-		case op.GT:
-			a := code.ReadB()
-
-			val1 := ctx.Get(int(a))
-			val2 := ctx.Get(int(a) + 1)
-
-			ctx.Set(int(a), val1.(int) > val2.(int))
-		case op.GE:
-			a := code.ReadB()
-
-			val1 := ctx.Get(int(a))
-			val2 := ctx.Get(int(a) + 1)
-
-			ctx.Set(int(a), val1.(int) >= val2.(int))
+			ctx.Set(int(a), res)
 		case op.String:
 			a := code.ReadB()
 			b := code.ReadB()
@@ -231,4 +213,40 @@ func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetCla
 func (state *State) callinfoPop() {
 	ctx := state.context
 	ctx.callinfo.Pop()
+}
+
+func opCompare(ctx *context, a int, b int, code op.Code) (bool, error) {
+	val1, ok := toFloat64(ctx.Get(a))
+	if !ok {
+		return false, ErrNotPrimitiveTypeComparison
+	}
+
+	val2, ok := toFloat64(ctx.Get(b))
+	if !ok {
+		return false, ErrNotPrimitiveTypeComparison
+	}
+
+	switch code {
+	case op.LT:
+		return val1 < val2, nil
+	case op.LE:
+		return val1 <= val2, nil
+	case op.GT:
+		return val1 > val2, nil
+	case op.GE:
+		return val1 >= val2, nil
+	}
+
+	return false, ErrNotPrimitiveTypeComparison
+}
+
+func toFloat64(val Value) (float64, bool) {
+	switch v := val.(type) {
+	case int:
+		return float64(v), true
+	case float64:
+		return v, true
+	}
+
+	return 0, false
 }
