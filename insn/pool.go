@@ -1,6 +1,9 @@
 package insn
 
-import "fmt"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 type PoolType uint8
 
@@ -17,6 +20,7 @@ type PoolReader = func(Reader) (any, error)
 
 var poolReaders = map[PoolType]PoolReader{
 	PoolString: readStringPool,
+	PoolFloat:  readFloatPool,
 }
 
 func readPool(r Reader) (any, error) {
@@ -35,4 +39,13 @@ func readPool(r Reader) (any, error) {
 
 func readStringPool(r Reader) (any, error) {
 	return r.String()
+}
+
+func readFloatPool(r Reader) (any, error) {
+	var v float64
+	if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
+		return nil, err
+	}
+
+	return v, nil
 }

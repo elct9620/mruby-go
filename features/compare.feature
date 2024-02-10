@@ -12,3 +12,7 @@ Feature: Compare
       | 1    | <        | 1    | false |
       | 1    | <=       | 1    | true  |
       | 1    | ==       | 1    | true  |
+      | 2.5  | >        | 1    | true  |
+      | 3.5  | <        | 1    | false |
+      | 1.2  | ==       | 1    | false |
+      | 3.12 | >=       | 3.11 | true  |

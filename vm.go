@@ -50,6 +50,11 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 		switch opCode {
 		case op.Move:
 			ctx.Set(int(code.ReadB()), ctx.Get(int(code.ReadB())))
+		case op.LoadL:
+			a := code.ReadB()
+			b := code.ReadB()
+
+			ctx.Set(int(a), rep.PoolValue(b))
 		case op.LoadI:
 			a := code.ReadB()
 			b := code.ReadB()
