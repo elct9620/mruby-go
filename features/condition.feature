@@ -13,3 +13,4 @@ Feature: Condition
       | condition | expected |
       | 1 > 2     | no       |
       | 1 < 2     | yes      |
+      | nil       | no       |

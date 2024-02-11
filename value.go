@@ -5,13 +5,14 @@ func NewObjectValue(v any) Value {
 }
 
 func Bool(v Value) bool {
-	ret, ok := v.(bool)
-
-	if !ok {
+	switch v := v.(type) {
+	case nil:
 		return false
+	case bool:
+		return v
+	default:
+		return true
 	}
-
-	return ret
 }
 
 func Test(v Value) bool {
