@@ -37,6 +37,16 @@ func (s *Sequence) ReadW() []byte {
 	return b
 }
 
+// Cursor returns the current position of the cursor.
+func (s *Sequence) Cursor() int {
+	return s.cursor
+}
+
+// Seek sets the cursor to the given position.
+func (s *Sequence) Seek(pos int) {
+	s.cursor = pos
+}
+
 // Clone returns a new sequence with the same code and cursor.
 func (s *Sequence) Clone() *Sequence {
 	return &Sequence{code: s.code, cursor: s.cursor}

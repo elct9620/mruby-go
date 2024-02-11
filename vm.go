@@ -94,6 +94,20 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			a := code.ReadB()
 			b := code.ReadB()
 			mrb.VmSetConst(rep.Symbol(b), ctx.Get(int(a)))
+		case op.Jmp:
+			a := code.ReadS()
+			offset := int(int16(binary.BigEndian.Uint16(a)))
+			code.Seek(code.Cursor() + offset)
+		case op.JmpNot:
+			a := code.ReadB()
+			b := code.ReadS()
+
+			val := ctx.Get(int(a))
+
+			if !Test(val) {
+				offset := int(int16(binary.BigEndian.Uint16(b)))
+				code.Seek(code.Cursor() + offset)
+			}
 		case op.SelfSend, op.Send, op.SendB:
 			a := code.ReadB()
 			b := code.ReadB()
