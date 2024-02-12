@@ -41,6 +41,10 @@ func NewRepresentation(mrb State, r Reader) (*Representation, error) {
 	return rep, nil
 }
 
+func (rep *Representation) Locals() uint16 {
+	return rep.nLocals
+}
+
 func (rep *Representation) Sequence() *Sequence {
 	return rep.iSeq
 }

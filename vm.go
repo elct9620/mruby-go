@@ -161,7 +161,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			ctx.Set(int(a), rep.PoolValue(b))
 		case op.Return:
 			a := code.ReadB()
-			return ctx.Get(int(a)), nil
+			ret := ctx.Get(int(a))
+
+			ctx.Set(int(rep.Locals()), ret)
+			goto Stop
 		case op.StrCat:
 			a := code.ReadB()
 			ctx.Set(int(a), fmt.Sprintf("%v%v", ctx.Get(int(a)), ctx.Get(int(a)+1)))
@@ -206,10 +209,15 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 		case op.TClass:
 			a := code.ReadB()
 			ctx.Set(int(a), mrb.context.GetCallinfo().TargetClass())
+		case op.Stop:
+			goto Stop
 		default:
 			return nil, fmt.Errorf("opcode %d not implemented", opCode)
 		}
 	}
+
+Stop:
+	return ctx.Get(int(rep.Locals())), nil
 }
 
 func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetClass *Class) *callinfo {
