@@ -16,7 +16,7 @@ var (
 )
 
 func (mrb *State) TopRun(proc RProc, self Value) (Value, error) {
-	mrb.callinfoPush(0, 0, 0, mrb.ObjectClass)
+	mrb.callinfoPush(0, 0, mrb.ObjectClass, proc, nil, 0, 0)
 
 	return mrb.VmRun(proc, self)
 }
@@ -122,7 +122,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 
 			mid := rep.Symbol(b)
 
-			ci := mrb.callinfoPush(mid, int(a), c, nil)
+			ci := mrb.callinfoPush(int(a), 0, nil, nil, nil, mid, uint16(c))
 			recv := ctx.Get(0)
 			ci.targetClass = mrb.Class(recv)
 
@@ -132,6 +132,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 				ctx.Set(int(a), nil)
 				mrb.callinfoPop()
 				break
+			}
+
+			if method.IsProc() {
+				ci.proc = method.Proc()
 			}
 
 			ctx.Set(0, method.Call(mrb, recv))
@@ -220,7 +224,7 @@ Stop:
 	return ctx.Get(int(rep.Locals())), nil
 }
 
-func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetClass *Class) *callinfo {
+func (state *State) callinfoPush(pushStack int, cci uint8, targetClass RClass, proc RProc, block RProc, mid Symbol, argc uint16) *callinfo {
 	ctx := state.context
 	prevCi := ctx.GetCallinfo()
 
@@ -233,6 +237,7 @@ func (state *State) callinfoPush(mid Symbol, pushStack int, argc byte, targetCla
 		stackOffset: prevCi.stackOffset + pushStack,
 		numArgs:     int(argc & 0xf),
 		targetClass: targetClass,
+		proc:        proc,
 	}
 	ctx.callinfo.Push(callinfo)
 

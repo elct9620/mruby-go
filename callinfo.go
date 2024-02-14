@@ -5,6 +5,7 @@ type callinfo struct {
 	methodId    Symbol
 	stackOffset int
 	targetClass RClass
+	proc        RProc
 }
 
 func (ci *callinfo) TargetClass() RClass {
