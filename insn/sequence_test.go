@@ -63,6 +63,20 @@ func Test_ReadW(t *testing.T) {
 	}
 }
 
+func Test_Cursor(t *testing.T) {
+	iseq := insn.NewSequence([]byte{
+		0x01, 0x02,
+	})
+
+	iseq.ReadB()
+
+	cursor := iseq.Cursor()
+
+	if cursor != 1 {
+		t.Errorf("Expected cursor 1, got %v", cursor)
+	}
+}
+
 func Test_Clone(t *testing.T) {
 	iseq := insn.NewSequence([]byte{
 		0x01, 0x02,
