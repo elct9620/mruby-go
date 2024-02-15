@@ -6,6 +6,16 @@ import (
 	"github.com/elct9620/mruby-go/stack"
 )
 
+func Test_StackCursor(t *testing.T) {
+	s := stack.New[int](10)
+	s.Push(1)
+	s.Push(2)
+
+	if s.Cursor() != 1 {
+		t.Errorf("Expected 1, got %d", s.Cursor())
+	}
+}
+
 func Test_StackPush(t *testing.T) {
 	s := stack.New[int](10)
 	s.Push(1)

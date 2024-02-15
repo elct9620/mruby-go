@@ -14,6 +14,10 @@ func New[T any](size int) *Stack[T] {
 	}
 }
 
+func (s *Stack[T]) Cursor() int {
+	return s.current
+}
+
 func (s *Stack[T]) Push(v T) {
 	s.current++
 

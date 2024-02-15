@@ -167,7 +167,11 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			a := code.ReadB()
 			ret := ctx.Get(int(a))
 
-			ctx.Set(int(rep.Locals()), ret)
+			if ctx.IsTop() {
+				ctx.Set(int(rep.Locals()), ret)
+				goto Stop
+			}
+
 			goto Stop
 		case op.StrCat:
 			a := code.ReadB()

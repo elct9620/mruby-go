@@ -1,6 +1,7 @@
 package mruby
 
 type CallinfoStack interface {
+	Cursor() int
 	Push(*callinfo)
 	Pop() *callinfo
 	Peek() *callinfo
@@ -15,6 +16,10 @@ type ContextStack interface {
 type context struct {
 	stack    ContextStack
 	callinfo CallinfoStack
+}
+
+func (ctx *context) IsTop() bool {
+	return ctx.callinfo.Cursor() == 0
 }
 
 func (ctx *context) GetCallinfo() *callinfo {
