@@ -135,7 +135,17 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			}
 
 			if method.IsProc() {
-				ci.proc = method.Proc()
+				proc := method.Proc()
+				ci.proc = proc
+
+				if !proc.IsGoFunction() {
+					nirep := proc.Body().(*insn.Representation)
+
+					rep = nirep
+					code = nirep.Sequence().Clone()
+
+					continue
+				}
 			}
 
 			ctx.Set(0, method.Call(mrb, recv))
