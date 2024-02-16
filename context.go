@@ -26,6 +26,10 @@ func (ctx *context) GetCallinfo() *callinfo {
 	return ctx.callinfo.Peek()
 }
 
+func (ctx *context) SetSequenceCursor(pc int) {
+	ctx.GetCallinfo().SetSequnceCursor(pc)
+}
+
 func (ctx *context) Get(idx int) Value {
 	offset := ctx.GetCallinfo().stackOffset
 	return ctx.stack.Get(offset + idx)
