@@ -16,7 +16,9 @@ var (
 )
 
 func (mrb *State) TopRun(proc RProc, self Value) (Value, error) {
-	mrb.callinfoPush(0, 0, mrb.ObjectClass, proc, nil, 0, 0)
+	if !mrb.context.IsTop() {
+		mrb.callinfoPush(0, 0, mrb.ObjectClass, proc, nil, 0, 0)
+	}
 
 	return mrb.VmRun(proc, self)
 }
@@ -217,7 +219,17 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 				goto Stop
 			}
 
-			goto Stop
+			ctx.Set(0, ret)
+			ci := mrb.callinfoPop()
+			proc := ci.Proc()
+			nirep, ok := proc.Body().(*insn.Representation)
+			if !ok {
+				return nil, ErrIRepNotFound
+			}
+
+			rep = nirep
+			code = rep.Sequence().Clone()
+			code.Seek(ci.GetSequnceCursor())
 		case op.StrCat:
 			a := code.ReadB()
 			ctx.SetSequenceCursor(code.Cursor())
@@ -301,9 +313,11 @@ func (state *State) callinfoPush(pushStack int, cci uint8, targetClass RClass, p
 	return callinfo
 }
 
-func (state *State) callinfoPop() {
+func (state *State) callinfoPop() *callinfo {
 	ctx := state.context
 	ctx.callinfo.Pop()
+
+	return ctx.GetCallinfo()
 }
 
 func opCompare(ctx *context, a int, b int, code op.Code) (bool, error) {

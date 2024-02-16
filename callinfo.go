@@ -16,3 +16,11 @@ func (ci *callinfo) TargetClass() RClass {
 func (ci *callinfo) SetSequnceCursor(pc int) {
 	ci.pc = pc
 }
+
+func (ci *callinfo) GetSequnceCursor() int {
+	return ci.pc
+}
+
+func (ci *callinfo) Proc() RProc {
+	return ci.proc
+}
