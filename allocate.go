@@ -29,3 +29,7 @@ func (mrb *State) AllocModule() *Module {
 		},
 	}
 }
+
+func (mrb *State) AllocObject(class RClass) RObject {
+	return &Object{object{class}, nil}
+}

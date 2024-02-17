@@ -37,10 +37,8 @@ type SingletonClass struct {
 
 func (mrb *State) Class(v Value) RClass {
 	switch v := v.(type) {
-	case RClass:
-		return v.Class()
 	case RObject:
-		return mrb.ObjectClass
+		return v.Class()
 	case bool:
 		if v {
 			return mrb.TrueClass
@@ -225,12 +223,12 @@ func allocObject(mrb *State, self Value) Value {
 	args := mrb.GetArgv()
 	argc := mrb.GetArgc()
 
-	super := mrb.ObjectClass
+	class := self.(RClass)
 	if argc > 0 {
-		super = args[0].(*Class)
+		class = args[0].(RClass)
 	}
 
-	return &Object{object{super}, nil}
+	return mrb.AllocObject(class)
 }
 
 func initClass(mrb *State) (err error) {
@@ -264,6 +262,7 @@ func initClass(mrb *State) (err error) {
 	mrb.nameClass(classClass, nil, _Class(mrb))
 
 	mrb.initClassNew(classClass)
+	mrb.topSelf = mrb.AllocObject(objectClass)
 
 	return
 }

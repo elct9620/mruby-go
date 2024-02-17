@@ -23,7 +23,7 @@ type State struct {
 	TrueClass    *Class
 	KernelModule RClass
 
-	topSelf *Object
+	topSelf RObject
 
 	symbolTable map[string]Symbol
 	symbolIndex int
@@ -34,7 +34,6 @@ func New() (*State, error) {
 		context: &context{
 			callinfo: stack.New[*callinfo](CallinfoInitSize),
 		},
-		topSelf:     &Object{},
 		symbolTable: make(map[string]Symbol),
 		symbolIndex: 0,
 	}

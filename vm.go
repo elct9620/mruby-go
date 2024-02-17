@@ -156,6 +156,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 
 			ci := mrb.callinfoPush(int(a), 0, nil, nil, nil, mid, uint16(c))
 			recv := ctx.Get(0)
+
 			ci.targetClass = mrb.Class(recv)
 
 			method := mrb.VmFindMethod(recv, ci.targetClass, ci.methodId)
@@ -263,6 +264,23 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
 			nproc := mrb.procNew(nirep)
 
 			ctx.Set(int(a), NewObjectValue(nproc))
+		case op.Exec:
+			a := code.ReadB()
+			b := code.ReadB()
+			ctx.SetSequenceCursor(code.Cursor())
+
+			recv, ok := ctx.Get(int(a)).(RClass)
+			if !ok {
+				return nil, fmt.Errorf("not a class: %v", ctx.Get(int(a)))
+			}
+
+			nirep := rep.Representation(b)
+			proc := mrb.procNew(nirep)
+
+			mrb.callinfoPush(int(a), 0, recv, proc, nil, 0, 0)
+
+			rep = nirep
+			code = rep.Sequence().Clone()
 		case op.Def:
 			a := code.ReadB()
 			b := code.ReadB()
