@@ -43,12 +43,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 		if r := recover(); r != nil {
 			ret = nil
 			switch v := r.(type) {
-			case error:
-				exc = mrb.ExceptionNewString(nil, v.Error())
 			case RException:
 				exc = v
-			default:
-				panic(r)
+			case error:
+				exc = mrb.ExceptionNewString(nil, v.Error())
 			}
 		}
 	}()
