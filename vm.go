@@ -38,7 +38,21 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 	return mrb.VmExec(proc, irep.Sequence().Clone())
 }
 
-func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (Value, error) {
+func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error) {
+	defer func() {
+		if r := recover(); r != nil {
+			ret = nil
+			switch v := r.(type) {
+			case error:
+				exc = mrb.ExceptionNewString(nil, v.Error())
+			case RException:
+				exc = v
+			default:
+				panic(r)
+			}
+		}
+	}()
+
 	rep, ok := proc.Body().(*insn.Representation)
 	if !ok {
 		return nil, ErrIRepNotFound
