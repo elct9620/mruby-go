@@ -38,7 +38,7 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 	return mrb.VmExec(proc, irep.Sequence().Clone())
 }
 
-func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error) {
+func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc RException) {
 	defer func() {
 		if r := recover(); r != nil {
 			ret = nil
@@ -46,14 +46,14 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 			case RException:
 				exc = v
 			case error:
-				exc = mrb.ExceptionNewString(nil, v.Error())
+				panic(v)
 			}
 		}
 	}()
 
 	rep, ok := proc.Body().(*insn.Representation)
 	if !ok {
-		return nil, ErrIRepNotFound
+		panic(ErrIRepNotFound)
 	}
 
 	ctx := mrb.context
@@ -212,7 +212,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 
 			res, err := opCompare(ctx, int(a), int(a)+1, opCode)
 			if err != nil {
-				return nil, err
+				panic(err)
 			}
 
 			ctx.Set(int(a), res)
@@ -237,7 +237,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 			proc := ci.Proc()
 			nirep, ok := proc.Body().(*insn.Representation)
 			if !ok {
-				return nil, ErrIRepNotFound
+				panic(ErrIRepNotFound)
 			}
 
 			rep = nirep
@@ -263,7 +263,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 
 			class, err := mrb.vmDefineClass(base, super, id)
 			if err != nil {
-				return nil, err
+				panic(err)
 			}
 
 			ctx.Set(int(a), NewObjectValue(class))
@@ -283,7 +283,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 
 			recv, ok := ctx.Get(int(a)).(RClass)
 			if !ok {
-				return nil, fmt.Errorf("not a class: %v", ctx.Get(int(a)))
+				panic(fmt.Errorf("not a class: %v", ctx.Get(int(a))))
 			}
 
 			nirep := rep.Representation(b)
@@ -315,7 +315,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc error)
 			ctx.SetSequenceCursor(code.Cursor())
 			goto Stop
 		default:
-			return nil, fmt.Errorf("opcode %d not implemented", opCode)
+			panic(fmt.Errorf("opcode %d not implemented", opCode))
 		}
 	}
 
