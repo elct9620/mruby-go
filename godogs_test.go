@@ -21,11 +21,21 @@ const SuiteSuccessCode = 0
 type RubyFeature struct {
 	mrb *mruby.State
 	ret mruby.Value
+	exc mruby.RException
 }
 
-func (feat *RubyFeature) iExecuteRubyCode(code *godog.DocString) (err error) {
-	feat.ret, err = feat.mrb.LoadString(code.Content)
-	return err
+func (feat *RubyFeature) iExecuteRubyCode(code *godog.DocString) error {
+	var exc error
+
+	feat.ret, exc = feat.mrb.LoadString(code.Content)
+	switch v := exc.(type) {
+	case mruby.RException:
+		feat.exc = v
+	case error:
+		return v
+	}
+
+	return nil
 }
 
 func (feat *RubyFeature) thereShouldReturnInteger(expected int) error {
@@ -141,6 +151,14 @@ func (feat *RubyFeature) thereShouldReturnModule(expected string) error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnException() error {
+	if feat.exc == nil {
+		return fmt.Errorf("expected exception, got %T", feat.ret)
+	}
+
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	mrb, err := mruby.New()
 	if err != nil {
@@ -161,6 +179,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return object$`, feat.thereShouldReturnObject)
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
 	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
+	s.Step(`^there should return exception$`, feat.thereShouldReturnException)
 }
 
 func init() {
