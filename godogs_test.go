@@ -151,9 +151,14 @@ func (feat *RubyFeature) thereShouldReturnModule(expected string) error {
 	return nil
 }
 
-func (feat *RubyFeature) thereShouldReturnException() error {
+func (feat *RubyFeature) theExceptionMessageShouldBe(expected string) error {
 	if feat.exc == nil {
 		return fmt.Errorf("expected exception, got %T", feat.ret)
+	}
+
+	actual := feat.exc.Error()
+	if actual != expected {
+		return fmt.Errorf("expected %s, got %s", expected, actual)
 	}
 
 	return nil
@@ -179,7 +184,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return object$`, feat.thereShouldReturnObject)
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
 	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
-	s.Step(`^there should return exception$`, feat.thereShouldReturnException)
+	s.Step(`^the exception message should be "([^"]*)"$`, feat.theExceptionMessageShouldBe)
 }
 
 func init() {

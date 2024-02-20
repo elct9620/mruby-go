@@ -176,7 +176,8 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc RExcep
 			if method == nil {
 				ctx.Set(int(a), nil)
 				mrb.callinfoPop()
-				break
+
+				panic(mrb.ExceptionNewString(nil, fmt.Sprintf("undefined method `%s' for %s", mrb.SymbolName(mid), mrb.ClassName(ci.targetClass))))
 			}
 
 			if method.IsProc() {

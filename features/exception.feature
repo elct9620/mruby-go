@@ -5,4 +5,4 @@ Feature: Exception
       """
       raise "error"
       """
-    Then there should return exception
+    Then the exception message should be "error"
