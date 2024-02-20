@@ -16,11 +16,11 @@ type (
 type State struct {
 	context *context
 
-	ObjectClass  *Class
-	ModuleClass  *Class
-	ClassClass   *Class
-	FalseClass   *Class
-	TrueClass    *Class
+	ObjectClass  RClass
+	ModuleClass  RClass
+	ClassClass   RClass
+	FalseClass   RClass
+	TrueClass    RClass
 	KernelModule RClass
 
 	topSelf RObject

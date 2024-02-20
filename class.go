@@ -1,11 +1,7 @@
 package mruby
 
 import (
-	"errors"
-)
-
-var (
-	ErrObjectClassNotExists = errors.New("Object class not exists")
+	"fmt"
 )
 
 type methodTable map[Symbol]Method
@@ -50,7 +46,7 @@ func (mrb *State) Class(v Value) RClass {
 	return nil
 }
 
-func (mrb *State) DefineClassId(name Symbol, super *Class) (*Class, error) {
+func (mrb *State) DefineClassId(name Symbol, super RClass) (RClass, error) {
 	return mrb.defineClass(name, super, mrb.ObjectClass)
 }
 
@@ -96,7 +92,7 @@ func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) Method {
 	return nil
 }
 
-func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (*Class, error) {
+func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (RClass, error) {
 	superClass, ok := super.(*Class)
 	if super != nil && !ok {
 		panic("super is not a class")
@@ -111,7 +107,7 @@ func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (*Class, er
 	return mrb.defineClass(id, superClass, outerModule)
 }
 
-func (mrb *State) defineClass(name Symbol, super RClass, outer RClass) (*Class, error) {
+func (mrb *State) defineClass(name Symbol, super RClass, outer RClass) (RClass, error) {
 	class, err := mrb.ClassNew(super)
 	if err != nil {
 		return nil, err
@@ -128,7 +124,7 @@ func (mrb *State) setupClass(class RClass, outer RClass, id Symbol) {
 
 func (mrb *State) prepareSingletonClass(obj RObject) error {
 	if obj.Class() == nil {
-		return ErrObjectClassNotExists
+		return fmt.Errorf("class not found on object type %T", obj)
 	}
 
 	if _, ok := obj.Class().(*SingletonClass); ok {
@@ -243,6 +239,7 @@ func initClass(mrb *State) (err error) {
 	basicObject.object.class = classClass
 	objectClass.object.class = classClass
 	moduleClass.object.class = classClass
+	classClass.object.class = classClass
 
 	for _, class := range []RClass{basicObject, objectClass, moduleClass, classClass} {
 		err = mrb.prepareSingletonClass(class)
