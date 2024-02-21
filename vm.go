@@ -38,15 +38,16 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 	return mrb.VmExec(proc, irep.Sequence().Clone())
 }
 
-func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, exc RException) {
+func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			ret = nil
+
 			switch v := r.(type) {
 			case RException:
-				exc = v
+				ret = v
 			case error:
-				panic(v)
+				err = v
 			}
 		}
 	}()
