@@ -57,6 +57,7 @@ func initObject(mrb *State) (err error) {
 	putsSym := mrb.Intern("puts")
 	mrb.DefineMethodId(mrb.ObjectClass, putsSym, objectPuts)
 
+	mrb.DefineMethodId(mrb.ObjectClass, _raise(mrb), objectRaise)
 	return nil
 }
 
@@ -64,4 +65,11 @@ func objectPuts(mrb *State, recv Value) Value {
 	args := mrb.GetArgv()
 	fmt.Println(args...)
 	return args[0]
+}
+
+func objectRaise(mrb *State, recv Value) Value {
+	args := mrb.GetArgv()
+	mrb.Raise(nil, fmt.Sprint(args...))
+
+	return nil
 }
