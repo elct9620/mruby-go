@@ -15,10 +15,6 @@ type Exception struct {
 	message string
 }
 
-func (e *Exception) Class() RClass {
-	return nil
-}
-
 func (e *Exception) Error() string {
 	return e.message
 }
@@ -49,8 +45,4 @@ func (mrb *State) ExceptionNewString(class RClass, message string) RException {
 	exc.SetMessage(message)
 
 	return exc
-}
-
-func (mrb *State) ExceptionMessageSet(exc RException, message string) {
-	exc.SetMessage(message)
 }
