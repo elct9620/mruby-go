@@ -17,3 +17,10 @@ Feature: Method
       hello
       """
     Then there should return string "Hello, World!"
+
+  Scenario: When I call a undefined method it should raise an error
+    When I execute ruby code:
+      """
+      hello
+      """
+    Then the exception message should be "undefined method 'hello' for Object"
