@@ -4,10 +4,12 @@ import "fmt"
 
 type object struct {
 	class RClass
+	flags uint32
 }
 
 type RBasic interface {
 	Class() RClass
+	Flags() uint32
 }
 
 type RObject interface {
@@ -26,6 +28,10 @@ type Object struct {
 
 func (obj *object) Class() RClass {
 	return obj.class
+}
+
+func (obj *object) Flags() uint32 {
+	return obj.flags
 }
 
 func (obj *Object) ivPut(sym Symbol, val Value) {
