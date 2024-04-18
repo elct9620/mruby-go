@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+var (
+	FlagClassIsInherited  = uint32(1 << 17)
+	FlagUndefinedAllocate = uint32(1 << 6)
+)
+
 type methodTable map[Symbol]Method
 type mt = methodTable
 
@@ -65,6 +70,14 @@ func (mrb *State) ClassName(class RClass) string {
 
 func (mrb *State) ClassNew(super RClass) (*Class, error) {
 	class := mrb.bootDefineClass(super)
+
+	// mrb_check_inheritable(mrb, super)
+	superClass, ok := super.(*Class)
+
+	if superClass != nil && ok {
+		class.flags |= super.Flags() & FlagUndefinedAllocate
+	}
+
 	err := mrb.prepareSingletonClass(class)
 	if err != nil {
 		return nil, err
@@ -154,8 +167,10 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 
 func (mrb *State) bootDefineClass(super RClass) *Class {
 	class := mrb.AllocClass()
+
 	if super != nil {
 		class.super = super
+		class.flags |= FlagClassIsInherited
 	} else {
 		class.super = mrb.ObjectClass
 	}
