@@ -2,6 +2,7 @@ package mruby
 
 import (
 	"fmt"
+	"reflect"
 )
 
 var (
@@ -69,12 +70,13 @@ func (mrb *State) ClassName(class RClass) string {
 }
 
 func (mrb *State) ClassNew(super RClass) (*Class, error) {
+	isNilSuper := reflect.ValueOf(super).IsNil()
+	if !isNilSuper {
+		mrb.checkInheritable(super)
+	}
+
 	class := mrb.bootDefineClass(super)
-
-	// mrb_check_inheritable(mrb, super)
-	superClass, ok := super.(*Class)
-
-	if superClass != nil && ok {
+	if !isNilSuper {
 		class.flags |= super.Flags() & FlagUndefinedAllocate
 	}
 
@@ -228,6 +230,20 @@ func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 
 func (mrb *State) initClassNew(class RClass) {
 	mrb.DefineMethodId(class, _new(mrb), allocObject)
+}
+
+func (mrb *State) checkInheritable(super RClass) {
+	if _, ok := super.(*Class); !ok {
+		mrb.Raisef(nil, "superclass must be a Class (%T given)", super)
+	}
+
+	if _, ok := super.(*SingletonClass); ok {
+		mrb.Raisef(nil, "can't make subclass of singleton class")
+	}
+
+	if super == mrb.ClassClass {
+		mrb.Raisef(nil, "can't make subclass of Class")
+	}
 }
 
 func allocObject(mrb *State, self Value) Value {
