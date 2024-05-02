@@ -39,7 +39,7 @@ jobs:
         with:
           mruby-version: ${{ matrix.mruby-version }}
       - name: Run Test with CodeClimate
-        uses: paambaati/codeclimate-action@v5.0.0
+        uses: paambaati/codeclimate-action@v6.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
