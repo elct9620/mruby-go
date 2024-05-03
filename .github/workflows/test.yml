@@ -26,7 +26,7 @@ jobs:
           - 1.20.x
         mruby-version:
           - 3.2.0
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest, macos-13]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
