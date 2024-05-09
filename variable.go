@@ -19,6 +19,10 @@ func (mrb *State) ObjectInstanceVariableGet(obj RObject, name Symbol) Value {
 	return obj.ivGet(name)
 }
 
+func (mrb *State) ObjectInstanceVariableDefined(obj RObject, name Symbol) bool {
+	return obj.ivGet(name) != nil
+}
+
 func (mrb *State) DefineConstById(klass RClass, name Symbol, val Value) {
 	mrb.ObjectInstanceVariableSetForce(klass, name, val)
 }

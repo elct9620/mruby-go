@@ -225,6 +225,10 @@ func (mrb *State) nameClass(class RClass, outer RClass, id Symbol) {
 	name := mrb.SymbolName(id)
 	nsym := _classname(mrb)
 
+	if mrb.ObjectInstanceVariableDefined(class, nsym) {
+		return
+	}
+
 	mrb.ObjectInstanceVariableSetForce(class, nsym, name)
 }
 
