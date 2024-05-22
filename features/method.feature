@@ -18,6 +18,36 @@ Feature: Method
       """
     Then there should return string "Hello, World!"
 
+  Scenario: I can call the method with argument
+    When I execute ruby code:
+      """
+      def hello(name)
+        "Hello, #{name}!"
+      end
+      hello("Ruby")
+      """
+    Then there should return string "Hello, Ruby!"
+
+  Scenario: I can call the method with default argument
+    When I execute ruby code:
+      """
+      def hello(name="World")
+        "Hello, #{name}!"
+      end
+      hello
+      """
+    Then there should return string "Hello, World!"
+
+  Scenario: I can call the method with multiple arguments
+    When I execute ruby code:
+      """
+      def hello(name, language)
+        "Hello, #{name}! I love #{language}"
+      end
+      hello("Ruby", "Ruby")
+      """
+    Then there should return string "Hello, Ruby! I love Ruby"
+
   Scenario: When I call a undefined method it should raise an error
     When I execute ruby code:
       """
