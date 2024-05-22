@@ -21,6 +21,7 @@ type State struct {
 	ClassClass   RClass
 	FalseClass   RClass
 	TrueClass    RClass
+	ArrayClass   RClass
 	KernelModule RClass
 
 	topSelf RObject

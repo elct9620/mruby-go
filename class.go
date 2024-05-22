@@ -41,6 +41,8 @@ func (mrb *State) Class(v Value) RClass {
 	switch v := v.(type) {
 	case RObject:
 		return v.Class()
+	case []Value:
+		return mrb.ArrayClass
 	case bool:
 		if v {
 			return mrb.TrueClass

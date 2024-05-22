@@ -48,7 +48,6 @@ Feature: Method
       """
     Then there should return string "Hello, Ruby! I love Ruby"
 
-  @wip
   Scenario: I can call the method with rest arguments
     When I execute ruby code:
       """

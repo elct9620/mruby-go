@@ -13,5 +13,9 @@ func initCore(mrb *State) (err error) {
 		return
 	}
 
+	if err = initArray(mrb); err != nil {
+		return
+	}
+
 	return
 }

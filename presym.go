@@ -19,5 +19,7 @@ var (
 	_Kernel      = predefineSymbol("Kernel")
 	_TrueClass   = predefineSymbol("TrueClass")
 	_FalseClass  = predefineSymbol("FalseClass")
+	_ArrayClass  = predefineSymbol("Array")
+	_join        = predefineSymbol("join")
 	_raise       = predefineSymbol("raise")
 )

@@ -198,7 +198,24 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 			ctx.Set(0, method.Call(mrb, recv))
 			mrb.callinfoPop()
 		case op.Enter:
-			_ = code.ReadW()
+			a := code.ReadW()
+			a = append([]byte{0x00}, a...)
+			aspec := int(binary.BigEndian.Uint32(a))
+
+			req := AspecReq(aspec)
+			opt := AspecOpt(aspec)
+			rest := AspecRest(aspec)
+
+			if rest > 0 {
+				values := make([]Value, 0)
+				argv := mrb.GetArgv()
+				for i := 0; i < len(argv); i++ {
+					values = append(values, argv[i])
+				}
+
+				ctx.Set(req+opt+1, values)
+			}
+
 			ctx.SetSequenceCursor(code.Cursor())
 		case op.EQ:
 			a := code.ReadB()
