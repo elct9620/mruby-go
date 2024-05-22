@@ -31,7 +31,7 @@ func (feat *RubyFeature) iExecuteRubyCode(code *godog.DocString) (err error) {
 func (feat *RubyFeature) thereShouldReturnInteger(expected int) error {
 	actual, ok := feat.ret.(int)
 	if !ok {
-		return fmt.Errorf("expected integer, got %T", feat.ret)
+		return fmt.Errorf("expected integer, got %T (%+v)", feat.ret, feat.ret)
 	}
 
 	if actual != expected {
@@ -44,7 +44,7 @@ func (feat *RubyFeature) thereShouldReturnInteger(expected int) error {
 func (feat *RubyFeature) thereShouldReturnTrue() error {
 	actual, ok := feat.ret.(bool)
 	if !ok {
-		return fmt.Errorf("expected bool, got %T", feat.ret)
+		return fmt.Errorf("expected bool, got %T (%+v)", feat.ret, feat.ret)
 	}
 
 	if !actual {
@@ -57,7 +57,7 @@ func (feat *RubyFeature) thereShouldReturnTrue() error {
 func (feat *RubyFeature) thereShouldReturnFalse() error {
 	actual, ok := feat.ret.(bool)
 	if !ok {
-		return fmt.Errorf("expected bool, got %T", feat.ret)
+		return fmt.Errorf("expected bool, got %T (%+v)", feat.ret, feat.ret)
 	}
 
 	if actual {
@@ -69,7 +69,7 @@ func (feat *RubyFeature) thereShouldReturnFalse() error {
 
 func (feat *RubyFeature) thereShouldReturnNil() error {
 	if feat.ret != nil {
-		return fmt.Errorf("expected nil, got %T", feat.ret)
+		return fmt.Errorf("expected nil, got %T (%+v)", feat.ret, feat.ret)
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func (feat *RubyFeature) thereShouldReturnNil() error {
 func (feat *RubyFeature) thereShouldReturnString(expected string) error {
 	actual, ok := feat.ret.(string)
 	if !ok {
-		return fmt.Errorf("expected string, got %T", feat.ret)
+		return fmt.Errorf("expected string, got %T (%+v)", feat.ret, feat.ret)
 	}
 
 	if !cmp.Equal(actual, expected) {
