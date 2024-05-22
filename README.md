@@ -12,6 +12,10 @@ The pure go mruby virtual machine implementation.
 
 The priority task is to make the virtual machine available with limited functions, it still depends on `mrbc` command to compile RiteBinary.
 
+* complete the method support
+* complete the class support
+* add mruby capability test
+
 ## MRB_API
 
 Golang has public and private method design and we can attach method to a struct. Therefore all public method is attach to `*mruby.State` in mruby-go as preferred method.
