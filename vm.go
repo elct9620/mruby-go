@@ -337,6 +337,7 @@ func (state *State) callinfoPush(pushStack int, cci uint8, targetClass RClass, p
 		methodId:    mid,
 		stackOffset: prevCi.stackOffset + pushStack,
 		numArgs:     int(argc & 0xf),
+		numKeywords: int((argc >> 4) & 0xf),
 		targetClass: targetClass,
 		proc:        proc,
 	}

@@ -2,6 +2,7 @@ package mruby
 
 type callinfo struct {
 	numArgs     int
+	numKeywords int
 	methodId    Symbol
 	stackOffset int
 	targetClass RClass
