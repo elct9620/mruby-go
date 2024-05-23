@@ -200,9 +200,19 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 		case op.Enter:
 			a := code.ReadW()
 			a = append([]byte{0x00}, a...)
-			aspec := int(binary.BigEndian.Uint32(a))
+			aspec := int(int32(binary.BigEndian.Uint32(a)))
+
+			ci := ctx.GetCallinfo()
+			argc := ci.numArgs
 
 			req := AspecReq(aspec)
+
+			if (aspec & ^0x7c0001) == 0 {
+				if argc != req {
+					mrb.Raisef(nil, "wrong number of arguments (given %d, expected %d)", argc, req)
+				}
+			}
+
 			opt := AspecOpt(aspec)
 			rest := AspecRest(aspec)
 

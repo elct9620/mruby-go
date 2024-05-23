@@ -28,6 +28,16 @@ Feature: Method
       """
     Then there should return string "Hello, Ruby!"
 
+  Scenario: The missing argument raise error
+    When I execute ruby code:
+      """
+      def hello(name)
+        "Hello, #{name}!"
+      end
+      hello
+      """
+    Then the exception message should be "wrong number of arguments (given 0, expected 1)"
+
   Scenario: I can call the method with default argument
     When I execute ruby code:
       """
