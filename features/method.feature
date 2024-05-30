@@ -68,6 +68,16 @@ Feature: Method
       """
     Then there should return string "Hello, Ruby, Python, JavaScript!"
 
+  Scenario: I can call the method with rest arguments and normal arguments
+    When I execute ruby code:
+      """
+      def hello(language, *names)
+        "Hello, #{names.join(', ')}! I love #{language}"
+      end
+      hello("Ruby", "Ruby", "Python", "JavaScript")
+      """
+    Then there should return string "Hello, Ruby, Python, JavaScript! I love Ruby"
+
   Scenario: When I call a undefined method it should raise an error
     When I execute ruby code:
       """

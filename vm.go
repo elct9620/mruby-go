@@ -206,6 +206,8 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 			argc := ci.numArgs
 
 			req := AspecReq(aspec)
+			opt := AspecOpt(aspec)
+			rest := AspecRest(aspec)
 
 			if (aspec & ^0x7c0001) == 0 {
 				if argc != req {
@@ -213,13 +215,10 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 				}
 			}
 
-			opt := AspecOpt(aspec)
-			rest := AspecRest(aspec)
-
 			if rest > 0 {
 				values := make([]Value, 0)
 				argv := mrb.GetArgv()
-				for i := 0; i < len(argv); i++ {
+				for i := req + opt; i < len(argv); i++ {
 					values = append(values, argv[i])
 				}
 
