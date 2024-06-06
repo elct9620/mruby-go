@@ -61,7 +61,10 @@ func (s *Stack[T]) Slice(start, end int) []T {
 		end = s.end
 	}
 
-	return s.elements[start:end]
+	subset := make([]T, end-start)
+	copy(subset, s.elements[start:end])
+
+	return subset
 }
 
 func (s *Stack[T]) Get(idx int) T {

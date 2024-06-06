@@ -244,6 +244,14 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 			}
 
 			ctx.Set(int(a), res)
+		case op.Array:
+			a := code.ReadB()
+			b := code.ReadB()
+
+			begin := int(a)
+			end := int(a) + int(b) - 1
+
+			ctx.Set(int(a), ctx.Slice(begin, end))
 		case op.String:
 			a := code.ReadB()
 			b := code.ReadB()

@@ -141,6 +141,24 @@ func (feat *RubyFeature) thereShouldReturnModule(expected string) error {
 	return nil
 }
 
+func (feat *RubyFeature) thereShouldReturnAnArray(doc *godog.DocString) error {
+	actual, ok := feat.ret.([]mruby.Value)
+
+	if !ok {
+		return fmt.Errorf("expected array, got %T", feat.ret)
+	}
+
+	actualStr := fmt.Sprintf("%+v", actual)
+	expectedStr := doc.Content
+
+	if !cmp.Equal(actualStr, expectedStr) {
+		return fmt.Errorf("array not matched %s", cmp.Diff(actual, expectedStr))
+
+	}
+
+	return nil
+}
+
 func (feat *RubyFeature) theExceptionMessageShouldBe(expected string) error {
 	exc, ok := feat.ret.(mruby.RException)
 
@@ -176,6 +194,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return object$`, feat.thereShouldReturnObject)
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
 	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
+	s.Step(`^there should return an array$`, feat.thereShouldReturnAnArray)
 	s.Step(`^the exception message should be "([^"]*)"$`, feat.theExceptionMessageShouldBe)
 }
 
