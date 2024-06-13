@@ -152,7 +152,25 @@ func (feat *RubyFeature) thereShouldReturnAnArray(doc *godog.DocString) error {
 	expectedStr := doc.Content
 
 	if !cmp.Equal(actualStr, expectedStr) {
-		return fmt.Errorf("array not matched %s", cmp.Diff(actual, expectedStr))
+		return fmt.Errorf("array not matched %s", cmp.Diff(actualStr, expectedStr))
+
+	}
+
+	return nil
+}
+
+func (feat *RubyFeature) thereShouldReturnAHash(doc *godog.DocString) error {
+	actual, ok := feat.ret.(map[mruby.Value]mruby.Value)
+
+	if !ok {
+		return fmt.Errorf("expected hash, got %T", feat.ret)
+	}
+
+	actualStr := fmt.Sprintf("%+v", actual)
+	expectedStr := doc.Content
+
+	if !cmp.Equal(actualStr, expectedStr) {
+		return fmt.Errorf("hash not matched %s", cmp.Diff(actualStr, expectedStr))
 
 	}
 
@@ -195,6 +213,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
 	s.Step(`^there should return module "([^"]*)"$`, feat.thereShouldReturnModule)
 	s.Step(`^there should return an array$`, feat.thereShouldReturnAnArray)
+	s.Step(`^there should return a hash$`, feat.thereShouldReturnAHash)
 	s.Step(`^the exception message should be "([^"]*)"$`, feat.theExceptionMessageShouldBe)
 }
 

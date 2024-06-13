@@ -284,6 +284,21 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 			ctx.SetSequenceCursor(code.Cursor())
 
 			ctx.Set(int(a), fmt.Sprintf("%v%v", ctx.Get(int(a)), ctx.Get(int(a)+1)))
+		case op.Hash:
+			a := code.ReadB()
+			b := code.ReadB()
+
+			hash := make(map[Value]Value, int(b))
+			limit := int(a) + int(b)*2
+
+			for i := int(a); i < limit; i += 2 {
+				key := ctx.Get(i)
+				val := ctx.Get(i + 1)
+
+				hash[key] = val
+			}
+
+			ctx.Set(int(a), hash)
 		case op.Class:
 			a := code.ReadB()
 			b := code.ReadB()
