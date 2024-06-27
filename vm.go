@@ -318,6 +318,18 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 			}
 
 			ctx.Set(int(a), NewObjectValue(class))
+		case op.Module:
+			a := code.ReadB()
+			b := code.ReadB()
+
+			id := rep.Symbol(b)
+			base, ok := ctx.Get(int(a)).(RClass)
+			if !ok {
+				base = mrb.ObjectClass
+			}
+
+			module := mrb.vmDefineModule(base, id)
+			ctx.Set(int(a), NewObjectValue(module))
 		case op.Method:
 			a := code.ReadB()
 			b := code.ReadB()
