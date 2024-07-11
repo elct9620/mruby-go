@@ -50,7 +50,13 @@ func (obj *Object) ivGet(sym Symbol) Value {
 	return obj.iv.Get(sym)
 }
 
+func (mrb *State) includeModuleAt(class, insPos, module RClass, superSearch int) int {
+	return 0
+}
+
 func (mrb *State) IncludeModule(class, module RClass) error {
+	mrb.includeModuleAt(class, findOrigin(class), module, 1)
+
 	return nil
 }
 

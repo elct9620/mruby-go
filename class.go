@@ -6,8 +6,10 @@ import (
 )
 
 var (
-	FlagClassIsInherited  = uint32(1 << 17)
 	FlagUndefinedAllocate = uint32(1 << 6)
+	FlagClassIsInherited  = uint32(1 << 17)
+	FlagClassIsOrigin     = uint32(1 << 18)
+	FlagClassIsPrepended  = uint32(1 << 19)
 )
 
 type methodTable map[Symbol]Method
@@ -250,6 +252,26 @@ func (mrb *State) checkInheritable(super RClass) {
 	if super == mrb.ClassClass {
 		mrb.Raisef(nil, "can't make subclass of Class")
 	}
+}
+
+func findOrigin(class RClass) RClass {
+	isNilClass := reflect.ValueOf(class).IsNil()
+	if isNilClass {
+		return nil
+	}
+
+	ret := class
+	if (ret.Flags() & FlagClassIsPrepended) != 0 {
+		ret = ret.Super()
+
+		for {
+			if (ret.Flags() & FlagClassIsOrigin) == 0 {
+				ret = ret.Super()
+			}
+		}
+	}
+
+	return ret
 }
 
 func allocObject(mrb *State, self Value) Value {
