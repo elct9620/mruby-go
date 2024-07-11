@@ -22,4 +22,5 @@ var (
 	_ArrayClass  = predefineSymbol("Array")
 	_join        = predefineSymbol("join")
 	_raise       = predefineSymbol("raise")
+	_inspect     = predefineSymbol("inspect")
 )
