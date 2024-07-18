@@ -16,9 +16,9 @@ jobs:
           go-version: '1.20'
           cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.53
+          version: v1.59
   test: # make sure the action works on a clean machine without building
     strategy:
       matrix:
