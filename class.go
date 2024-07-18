@@ -25,7 +25,7 @@ type RClass interface {
 }
 
 type class struct {
-	object
+	Object
 	super RClass
 	mt
 	iv
@@ -295,10 +295,10 @@ func initClass(mrb *State) (err error) {
 	classClass := mrb.bootDefineClass(moduleClass)
 	mrb.ClassClass = classClass
 
-	basicObject.object.class = classClass
-	objectClass.object.class = classClass
-	moduleClass.object.class = classClass
-	classClass.object.class = classClass
+	basicObject.Object.class = classClass
+	objectClass.Object.class = classClass
+	moduleClass.Object.class = classClass
+	classClass.Object.class = classClass
 
 	for _, class := range []RClass{basicObject, objectClass, moduleClass, classClass} {
 		err = mrb.prepareSingletonClass(class)

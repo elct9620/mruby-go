@@ -11,7 +11,7 @@ type RException interface {
 }
 
 type Exception struct {
-	object
+	Object
 	message string
 }
 

@@ -2,11 +2,6 @@ package mruby
 
 import "fmt"
 
-type object struct {
-	class RClass
-	flags uint32
-}
-
 type RBasic interface {
 	Class() RClass
 	Flags() uint32
@@ -22,15 +17,16 @@ var _ RBasic = &Object{}
 var _ RObject = &Object{}
 
 type Object struct {
-	object
+	class RClass
+	flags uint32
 	iv
 }
 
-func (obj *object) Class() RClass {
+func (obj *Object) Class() RClass {
 	return obj.class
 }
 
-func (obj *object) Flags() uint32 {
+func (obj *Object) Flags() uint32 {
 	return obj.flags
 }
 

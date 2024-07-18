@@ -23,7 +23,7 @@ var _ RProc = &proc{}
 var _ RBasic = &proc{}
 
 type proc struct {
-	object
+	Object
 	body any
 }
 
