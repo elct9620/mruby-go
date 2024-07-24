@@ -28,7 +28,7 @@ type class struct {
 	Object
 	super RClass
 	mt
-	iv
+	iv ivTable
 }
 
 type Class struct {
@@ -191,10 +191,10 @@ func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 
 func (c *class) ivPut(sym Symbol, val Value) {
 	if c.iv == nil {
-		c.iv = make(iv)
+		c.iv = make(ivTable)
 	}
 
-	c.iv.Put(sym, val)
+	c.iv[sym] = val
 }
 
 func (c *class) ivGet(sym Symbol) Value {
@@ -202,7 +202,7 @@ func (c *class) ivGet(sym Symbol) Value {
 		return nil
 	}
 
-	return c.iv.Get(sym)
+	return c.iv[sym]
 }
 
 func (c *class) mtPut(sym Symbol, method Method) {

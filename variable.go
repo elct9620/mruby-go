@@ -1,15 +1,6 @@
 package mruby
 
 type ivTable map[Symbol]Value
-type iv = ivTable
-
-func (iv ivTable) Get(sym Symbol) Value {
-	return iv[sym]
-}
-
-func (iv ivTable) Put(sym Symbol, val Value) {
-	iv[sym] = val
-}
 
 func (mrb *State) ObjectInstanceVariableSetForce(obj RObject, name Symbol, val Value) {
 	obj.ivPut(name, val)
