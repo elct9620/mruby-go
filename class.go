@@ -24,8 +24,9 @@ type RClass interface {
 }
 
 type class struct {
-	Object
 	super RClass
+	class RClass
+	flags uint32
 	mt    methodTable
 	iv    ivTable
 }
@@ -188,6 +189,14 @@ func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 	class.mtPut(name, method)
 }
 
+func (c *class) Class() RClass {
+	return c.class
+}
+
+func (c *class) Flags() uint32 {
+	return c.flags
+}
+
 func (c *class) ivPut(sym Symbol, val Value) {
 	if c.iv == nil {
 		c.iv = make(ivTable)
@@ -294,10 +303,10 @@ func initClass(mrb *State) (err error) {
 	classClass := mrb.bootDefineClass(moduleClass)
 	mrb.ClassClass = classClass
 
-	basicObject.Object.class = classClass
-	objectClass.Object.class = classClass
-	moduleClass.Object.class = classClass
-	classClass.Object.class = classClass
+	basicObject.class.class = classClass
+	objectClass.class.class = classClass
+	moduleClass.class.class = classClass
+	classClass.class.class = classClass
 
 	for _, class := range []RClass{basicObject, objectClass, moduleClass, classClass} {
 		err = mrb.prepareSingletonClass(class)
