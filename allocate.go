@@ -2,25 +2,19 @@ package mruby
 
 func (mrb *State) AllocClass() *Class {
 	return &Class{
-		class: class{
-			class: mrb.ClassClass,
-		},
+		class: mrb.ClassClass,
 	}
 }
 
 func (mrb *State) AllocSingletonClass() *SingletonClass {
 	return &SingletonClass{
-		class: class{
-			class: mrb.ClassClass,
-		},
+		class: mrb.ClassClass,
 	}
 }
 
 func (mrb *State) AllocModule() *Module {
 	return &Module{
-		class: class{
-			class: mrb.ModuleClass,
-		},
+		class: mrb.ModuleClass,
 	}
 }
 
