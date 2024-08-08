@@ -3,7 +3,9 @@ package mruby
 func (mrb *State) AllocClass() *Class {
 	return &Class{
 		class: class{
-			class: mrb.ClassClass,
+			Object: Object{
+				class: mrb.ClassClass,
+			},
 		},
 	}
 }
@@ -11,7 +13,9 @@ func (mrb *State) AllocClass() *Class {
 func (mrb *State) AllocSingletonClass() *SingletonClass {
 	return &SingletonClass{
 		class: class{
-			class: mrb.ClassClass,
+			Object: Object{
+				class: mrb.ClassClass,
+			},
 		},
 	}
 }
@@ -19,7 +23,9 @@ func (mrb *State) AllocSingletonClass() *SingletonClass {
 func (mrb *State) AllocModule() *Module {
 	return &Module{
 		class: class{
-			class: mrb.ModuleClass,
+			Object: Object{
+				class: mrb.ModuleClass,
+			},
 		},
 	}
 }
