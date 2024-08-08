@@ -13,6 +13,8 @@ var (
 
 type methodTable map[Symbol]Method
 
+var _ RClass = &Class{}
+
 type RClass interface {
 	RObject
 	Super() RClass
@@ -20,14 +22,20 @@ type RClass interface {
 	mtGet(Symbol) Method
 }
 
-var _ RClass = &Class{}
-
-type Class struct {
+type class struct {
 	super RClass
 	class RClass
 	flags uint32
 	mt    methodTable
 	iv    ivTable
+}
+
+type Class struct {
+	class
+}
+
+type SingletonClass struct {
+	class
 }
 
 func (mrb *State) Class(v Value) RClass {
@@ -182,15 +190,15 @@ func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 	class.mtPut(name, method)
 }
 
-func (c *Class) Class() RClass {
+func (c *class) Class() RClass {
 	return c.class
 }
 
-func (c *Class) Flags() uint32 {
+func (c *class) Flags() uint32 {
 	return c.flags
 }
 
-func (c *Class) ivPut(sym Symbol, val Value) {
+func (c *class) ivPut(sym Symbol, val Value) {
 	if c.iv == nil {
 		c.iv = make(ivTable)
 	}
@@ -198,7 +206,7 @@ func (c *Class) ivPut(sym Symbol, val Value) {
 	c.iv[sym] = val
 }
 
-func (c *Class) ivGet(sym Symbol) Value {
+func (c *class) ivGet(sym Symbol) Value {
 	if c.iv == nil {
 		return nil
 	}
@@ -206,7 +214,7 @@ func (c *Class) ivGet(sym Symbol) Value {
 	return c.iv[sym]
 }
 
-func (c *Class) mtPut(sym Symbol, method Method) {
+func (c *class) mtPut(sym Symbol, method Method) {
 	if c.mt == nil {
 		c.mt = make(methodTable)
 	}
@@ -214,7 +222,7 @@ func (c *Class) mtPut(sym Symbol, method Method) {
 	c.mt[sym] = method
 }
 
-func (c *Class) mtGet(sym Symbol) Method {
+func (c *class) mtGet(sym Symbol) Method {
 	if c.mt == nil {
 		return nil
 	}
@@ -222,7 +230,7 @@ func (c *Class) mtGet(sym Symbol) Method {
 	return c.mt[sym]
 }
 
-func (c *Class) Super() RClass {
+func (c *class) Super() RClass {
 	return c.super
 }
 
@@ -295,10 +303,10 @@ func initClass(mrb *State) (err error) {
 	classClass := mrb.bootDefineClass(moduleClass)
 	mrb.ClassClass = classClass
 
-	basicObject.class = classClass
-	objectClass.class = classClass
-	moduleClass.class = classClass
-	classClass.class = classClass
+	basicObject.class.class = classClass
+	objectClass.class.class = classClass
+	moduleClass.class.class = classClass
+	classClass.class.class = classClass
 
 	for _, class := range []RClass{basicObject, objectClass, moduleClass, classClass} {
 		err = mrb.prepareSingletonClass(class)
