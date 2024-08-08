@@ -19,7 +19,7 @@ var _ RObject = &Object{}
 type Object struct {
 	class RClass
 	flags uint32
-	iv    ivTable
+	iv
 }
 
 func (obj *Object) Class() RClass {
@@ -32,10 +32,10 @@ func (obj *Object) Flags() uint32 {
 
 func (obj *Object) ivPut(sym Symbol, val Value) {
 	if obj.iv == nil {
-		obj.iv = make(ivTable)
+		obj.iv = make(iv)
 	}
 
-	obj.iv[sym] = val
+	obj.iv.Put(sym, val)
 }
 
 func (obj *Object) ivGet(sym Symbol) Value {
@@ -43,7 +43,7 @@ func (obj *Object) ivGet(sym Symbol) Value {
 		return nil
 	}
 
-	return obj.iv[sym]
+	return obj.iv.Get(sym)
 }
 
 func (mrb *State) includeModuleAt(class, insPos, module RClass, superSearch int) int {
