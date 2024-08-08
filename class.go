@@ -66,13 +66,12 @@ func (mrb *State) ClassName(class RClass) string {
 }
 
 func (mrb *State) ClassNew(super RClass) (*Class, error) {
-	isNilSuper := reflect.ValueOf(super).IsNil()
-	if !isNilSuper {
+	if super != nil {
 		mrb.checkInheritable(super)
 	}
 
 	class := mrb.bootDefineClass(super)
-	if !isNilSuper {
+	if super != nil {
 		class.flags |= super.Flags() & FlagUndefinedAllocate
 	}
 
@@ -104,16 +103,19 @@ func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) Method {
 }
 
 func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (RClass, error) {
-	superClass, ok := super.(*Class)
-	if super != nil && !ok {
-		panic("super is not a class")
+	var superClass RClass
+	if super != nil {
+		if ClassP(super) {
+			superClass = super.(RClass)
+		} else {
+			panic("super is not a class")
+		}
 	}
 
-	// NOTE: check_if_class_or_module
-	outerModule, ok := outer.(*Class)
-	if !ok {
+	if !ClassPointerP(outer) {
 		panic("outer is not a class or module")
 	}
+	outerModule := outer.(RClass)
 
 	return mrb.defineClass(id, superClass, outerModule)
 }

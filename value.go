@@ -18,3 +18,25 @@ func Bool(v Value) bool {
 func Test(v Value) bool {
 	return Bool(v)
 }
+
+func ClassP(v Value) bool {
+	switch v.(type) {
+	case *Class:
+		return true
+	default:
+		return false
+	}
+}
+
+func ClassPointerP(v Value) bool {
+	switch v.(type) {
+	case *Class:
+		return true
+	case *SingletonClass:
+		return true
+	case *Module:
+		return true
+	default:
+		return false
+	}
+}
