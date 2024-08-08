@@ -2,7 +2,6 @@ package mruby
 
 import (
 	"fmt"
-	"reflect"
 )
 
 var (
@@ -257,8 +256,7 @@ func (mrb *State) checkInheritable(super RClass) {
 }
 
 func findOrigin(class RClass) RClass {
-	isNilClass := reflect.ValueOf(class).IsNil()
-	if isNilClass {
+	if class == nil {
 		return nil
 	}
 
