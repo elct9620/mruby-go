@@ -12,6 +12,7 @@ var (
 )
 
 type methodTable map[Symbol]Method
+type mt = methodTable
 
 var _ RClass = &Class{}
 
@@ -25,8 +26,8 @@ type RClass interface {
 type class struct {
 	Object
 	super RClass
-	mt    methodTable
-	iv    ivTable
+	mt
+	iv ivTable
 }
 
 type Class struct {
