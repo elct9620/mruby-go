@@ -346,7 +346,7 @@ func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error)
 
 			recv, ok := ctx.Get(int(a)).(RClass)
 			if !ok {
-				panic(fmt.Errorf("not a class: %v", ctx.Get(int(a))))
+				mrb.Raisef(nil, "not a class: %v", ctx.Get(int(a)))
 			}
 
 			nirep := rep.Representation(b)

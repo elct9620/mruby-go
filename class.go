@@ -115,12 +115,12 @@ func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (RClass, er
 		if ClassP(super) {
 			superClass = super.(RClass)
 		} else {
-			panic("super is not a class")
+			mrb.Raisef(nil, "superclass must be a Class (%T given)", super)
 		}
 	}
 
 	if !ClassPointerP(outer) {
-		panic("outer is not a class or module")
+		mrb.Raisef(nil, "outer is not a class or module")
 	}
 	outerModule := outer.(RClass)
 
