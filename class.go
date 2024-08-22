@@ -175,12 +175,30 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 	return nil
 }
 
-func (mrb *State) includeModuleAt(class, insPos, module RClass, superSearch int) int {
+func (mrb *State) includeModuleAt(class, insPos, module RClass, searchSuper bool) int {
+	for module != nil {
+		parentClass := class.Super()
+
+		if module.Flags()&FlagClassIsPrepended != 0 {
+			goto Skip
+		}
+
+		for parentClass != nil {
+			if !searchSuper {
+				break
+			}
+
+			parentClass = parentClass.Super()
+		}
+	Skip:
+		module = module.Super()
+	}
+
 	return 0
 }
 
 func (mrb *State) IncludeModule(class, module RClass) error {
-	mrb.includeModuleAt(class, findOrigin(class), module, 1)
+	mrb.includeModuleAt(class, findOrigin(class), module, true)
 
 	return nil
 }
