@@ -9,6 +9,7 @@ var (
 	FlagClassIsInherited  = uint32(1 << 17)
 	FlagClassIsOrigin     = uint32(1 << 18)
 	FlagClassIsPrepended  = uint32(1 << 19)
+	FlagObjectIsFrozen    = uint32(1 << 20)
 )
 
 type methodTable map[Symbol]Method
@@ -169,6 +170,8 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 	}
 
 	mrb.ObjectInstanceVariableSetForce(singletonClass, _attached(mrb), obj)
+	singletonClass.flags = singletonClass.Flags() & FlagObjectIsFrozen
+
 	return nil
 }
 
