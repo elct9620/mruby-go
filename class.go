@@ -16,10 +16,12 @@ type methodTable map[Symbol]Method
 type mt = methodTable
 
 var _ RClass = &Class{}
+var _ RClass = &SingletonClass{}
 
 type RClass interface {
 	RObject
 	Super() RClass
+	setSuper(RClass)
 	mtPut(Symbol, Method)
 	mtGet(Symbol) Method
 }
@@ -219,6 +221,10 @@ func (mrb *State) bootDefineClass(super RClass) *Class {
 
 func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 	class.mtPut(name, method)
+}
+
+func (c *class) setSuper(super RClass) {
+	c.super = super
 }
 
 func (c *class) ivPut(sym Symbol, val Value) {
