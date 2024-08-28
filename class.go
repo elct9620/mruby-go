@@ -177,6 +177,12 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 	return nil
 }
 
+func (mrb *State) includeClassNew(module, super RClass) RClass {
+	ic := mrb.AllocClass()
+
+	return ic
+}
+
 func (mrb *State) includeModuleAt(class, insPos, module RClass, searchSuper bool) int {
 	for module != nil {
 		parentClass := class.Super()
@@ -191,6 +197,12 @@ func (mrb *State) includeModuleAt(class, insPos, module RClass, searchSuper bool
 			}
 
 			parentClass = parentClass.Super()
+		}
+
+		{
+			ic := mrb.includeClassNew(module, insPos.Super())
+			insPos.setSuper(ic)
+			insPos = ic
 		}
 	Skip:
 		module = module.Super()
