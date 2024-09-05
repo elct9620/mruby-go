@@ -20,6 +20,16 @@ func (mrb *State) AllocSingletonClass() *SingletonClass {
 	}
 }
 
+func (mrb *State) AllocInheritClass() *InheritClass {
+	return &InheritClass{
+		class: class{
+			Object: Object{
+				class: mrb.ClassClass,
+			},
+		},
+	}
+}
+
 func (mrb *State) AllocModule() *Module {
 	return &Module{
 		class: class{

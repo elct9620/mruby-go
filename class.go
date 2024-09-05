@@ -21,7 +21,10 @@ var _ RClass = &SingletonClass{}
 type RClass interface {
 	RObject
 	Super() RClass
+	setClass(RClass)
 	setSuper(RClass)
+	getMethodTable() methodTable
+	setMethodTable(methodTable)
 	mtPut(Symbol, Method)
 	mtGet(Symbol) Method
 }
@@ -38,6 +41,10 @@ type Class struct {
 }
 
 type SingletonClass struct {
+	class
+}
+
+type InheritClass struct {
 	class
 }
 
@@ -178,7 +185,20 @@ func (mrb *State) prepareSingletonClass(obj RObject) error {
 }
 
 func (mrb *State) includeClassNew(module, super RClass) RClass {
-	ic := mrb.AllocClass()
+	ic := mrb.AllocInheritClass()
+	if _, isIClass := module.(*InheritClass); isIClass {
+		module = module.Class()
+	}
+
+	module = findOrigin(module)
+	ic.setMethodTable(module.getMethodTable())
+	ic.setSuper(super)
+
+	if _, isIClass := module.(*InheritClass); isIClass {
+		ic.setClass(module.Class())
+	} else {
+		ic.setClass(module)
+	}
 
 	return ic
 }
@@ -237,6 +257,18 @@ func (mrb *State) defineMethodRaw(class RClass, name Symbol, method Method) {
 
 func (c *class) setSuper(super RClass) {
 	c.super = super
+}
+
+func (c *class) setClass(class RClass) {
+	c.class = class
+}
+
+func (c *class) getMethodTable() methodTable {
+	return c.mt
+}
+
+func (c *class) setMethodTable(mt methodTable) {
+	c.mt = mt
 }
 
 func (c *class) ivPut(sym Symbol, val Value) {
