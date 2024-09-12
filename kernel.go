@@ -1,7 +1,17 @@
 package mruby
 
 func objectInspect(mrb *State, self Value) Value {
-	return nil
+	switch v := self.(type) {
+	case *Object:
+		return "Object"
+	case *Class:
+		name := mrb.ObjectInstanceVariableGet(v, _classname(mrb))
+		return name
+	case *Module:
+		return "Module"
+	default:
+		return nil
+	}
 }
 
 func initKernel(mrb *State) (err error) {

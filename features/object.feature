@@ -17,3 +17,10 @@ Feature: Object
       Hello.new.world
       """
     Then there should return string "world"
+
+  Scenario: I can new a object
+    When I execute ruby code:
+      """
+      Object.inspect
+      """
+    Then there should return string "Object"
