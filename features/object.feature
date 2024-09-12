@@ -18,7 +18,7 @@ Feature: Object
       """
     Then there should return string "world"
 
-  Scenario: I can new a object
+  Scenario: I can inspect Object to get its name
     When I execute ruby code:
       """
       Object.inspect
