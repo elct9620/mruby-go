@@ -1,7 +1,5 @@
 package mruby
 
-import "fmt"
-
 type RBasic interface {
 	Class() RClass
 	Flags() uint32
@@ -46,19 +44,6 @@ func (obj *Object) ivGet(sym Symbol) Value {
 	return obj.iv.Get(sym)
 }
 
-func objectPuts(mrb *State, recv Value) Value {
-	args := mrb.GetArgv()
-	fmt.Println(args...)
-	return args[0]
-}
-
-func objectRaise(mrb *State, recv Value) Value {
-	args := mrb.GetArgv()
-	mrb.Raise(nil, fmt.Sprint(args...))
-
-	return nil
-}
-
 func initObject(mrb *State) (err error) {
 	mrb.FalseClass, err = mrb.DefineClassId(_FalseClass(mrb), mrb.ObjectClass)
 	if err != nil {
@@ -69,9 +54,5 @@ func initObject(mrb *State) (err error) {
 		return err
 	}
 
-	putsSym := mrb.Intern("puts")
-	mrb.DefineMethodId(mrb.ObjectClass, putsSym, objectPuts)
-
-	mrb.DefineMethodId(mrb.ObjectClass, _raise(mrb), objectRaise)
 	return nil
 }
