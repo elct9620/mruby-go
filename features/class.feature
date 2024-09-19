@@ -36,6 +36,6 @@ Feature: Class
       """
       class Foo
       end
-      Foo
+      Foo.inspect
       """
-    Then there should return class "Foo"
+    Then there should return string "Foo"

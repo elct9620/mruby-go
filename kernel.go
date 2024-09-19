@@ -5,12 +5,11 @@ import "fmt"
 func objectInspect(mrb *State, self Value) Value {
 	switch v := self.(type) {
 	case *Object:
-		return "Object"
-	case *Class:
+		name := mrb.ObjectInstanceVariableGet(v.Class(), _classname(mrb))
+		return name
+	case RClass:
 		name := mrb.ObjectInstanceVariableGet(v, _classname(mrb))
 		return name
-	case *Module:
-		return "Module"
 	default:
 		return nil
 	}

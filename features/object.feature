@@ -18,9 +18,14 @@ Feature: Object
       """
     Then there should return string "world"
 
-  Scenario: I can inspect Object to get its name
+  Scenario: I can inspect object which is an instance of a class
     When I execute ruby code:
       """
-      Object.inspect
+      class Hello
+        def world
+          "world"
+        end
+      end
+      Hello.new.inspect
       """
-    Then there should return string "Object"
+    Then there should return string "Hello"
