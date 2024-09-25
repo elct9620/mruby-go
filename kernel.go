@@ -2,6 +2,15 @@ package mruby
 
 import "fmt"
 
+func (mrb *State) Inspect(obj Value) string {
+	ret, ok := objectInspect(mrb, obj).(string)
+	if !ok {
+		return ""
+	}
+
+	return ret
+}
+
 func objectInspect(mrb *State, self Value) Value {
 	switch v := self.(type) {
 	case *Object:
@@ -10,6 +19,10 @@ func objectInspect(mrb *State, self Value) Value {
 	case RClass:
 		name := mrb.ObjectInstanceVariableGet(v, _classname(mrb))
 		return name
+	case string:
+		return fmt.Sprintf("%q", v)
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return fmt.Sprintf("%d", v)
 	default:
 		return nil
 	}
