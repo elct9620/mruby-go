@@ -27,7 +27,7 @@ jobs:
         mruby-version:
           - 3.2.0
           - 3.3.0
-        platform: [ubuntu-latest, macos-13]
+        platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
         with:
           mruby-version: ${{ matrix.mruby-version }}
       - name: Run Test with CodeClimate
-        uses: paambaati/codeclimate-action@v6.0.0
+        uses: paambaati/codeclimate-action@v9
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
