@@ -45,8 +45,10 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: go-${{ matrix.go-version }},mruby-${{ matrix.mruby-version }},platform-${{ matrix.platform }}
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: go-${{ matrix.go-version }},mruby-${{ matrix.mruby-version }},platform-${{ matrix.platform }}
