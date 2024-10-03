@@ -27,7 +27,7 @@ jobs:
         mruby-version:
           - 3.2.0
           - 3.3.0
-        platform: [ubuntu-latest, macos-13]
+        platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -39,13 +39,9 @@ jobs:
         uses: elct9620/setup-mruby@main
         with:
           mruby-version: ${{ matrix.mruby-version }}
-      - name: Run Test with CodeClimate
-        uses: paambaati/codeclimate-action@v9
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      - name: Run tests
+        run: go test -coverprofile=coverage.txt ./...
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          coverageCommand: go test -v -coverprofile coverage.out ./...
-          prefix: github.com/${{ github.event.repository.full_name }}
-          coverageLocations:
-            "${{github.workspace}}/coverage.out:gocov"
-
+          token: ${{ secrets.CODECOV_TOKEN }}
