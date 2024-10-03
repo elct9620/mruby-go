@@ -189,13 +189,7 @@ func (feat *RubyFeature) thereShouldReturnAHash(doc *godog.DocString) error {
 }
 
 func (feat *RubyFeature) theExceptionMessageShouldBe(expected string) error {
-	exc, ok := feat.exc.(mruby.RException)
-
-	if !ok {
-		return fmt.Errorf("expected exception, got %T", feat.ret)
-	}
-
-	actual := exc.Error()
+	actual := feat.exc.Error()
 	if actual != expected {
 		return fmt.Errorf("expected %s, got %s", expected, actual)
 	}
