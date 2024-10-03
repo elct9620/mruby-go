@@ -41,14 +41,7 @@ func (mrb *State) VmRun(proc RProc, self Value) (Value, error) {
 func (mrb *State) VmExec(proc RProc, code *insn.Sequence) (ret Value, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			ret = nil
-
-			switch v := r.(type) {
-			case RException:
-				ret = v
-			case error:
-				err = v
-			}
+			err = r.(error)
 		}
 	}()
 

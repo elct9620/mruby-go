@@ -31,13 +31,6 @@ func main() {
 		}
 
 		ret, err := mrb.LoadString(line)
-
-		// NOTE: ret may be error
-		errRet, ok := ret.(error)
-		if ok {
-			err = errRet
-		}
-
 		if err != nil {
 			fmt.Println(err)
 		} else {

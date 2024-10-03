@@ -22,11 +22,21 @@ const SuiteSuccessCode = 0
 type RubyFeature struct {
 	mrb *mruby.State
 	ret mruby.Value
+	exc mruby.RException
 }
 
-func (feat *RubyFeature) iExecuteRubyCode(code *godog.DocString) (err error) {
-	feat.ret, err = feat.mrb.LoadString(code.Content)
-	return
+func (feat *RubyFeature) iExecuteRubyCode(code *godog.DocString) error {
+	ret, err := feat.mrb.LoadString(code.Content)
+	if err != nil {
+		exc, ok := err.(mruby.RException)
+		if !ok {
+			return err
+		}
+		feat.exc = exc
+	}
+	feat.ret = ret
+
+	return nil
 }
 
 func (feat *RubyFeature) thereShouldReturnInteger(expected int) error {
@@ -179,7 +189,7 @@ func (feat *RubyFeature) thereShouldReturnAHash(doc *godog.DocString) error {
 }
 
 func (feat *RubyFeature) theExceptionMessageShouldBe(expected string) error {
-	exc, ok := feat.ret.(mruby.RException)
+	exc, ok := feat.exc.(mruby.RException)
 
 	if !ok {
 		return fmt.Errorf("expected exception, got %T", feat.ret)
