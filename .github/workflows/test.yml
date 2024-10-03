@@ -40,8 +40,13 @@ jobs:
         with:
           mruby-version: ${{ matrix.mruby-version }}
       - name: Run tests
-        run: go test -coverprofile=coverage.txt ./...
+        run: go test -coverprofile=coverage.txt --godog.format=junit ./...
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

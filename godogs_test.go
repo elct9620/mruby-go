@@ -3,6 +3,7 @@ package mruby_test
 import (
 	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -224,6 +225,15 @@ func init() {
 func TestFeatures(t *testing.T) {
 	o := opts
 	o.TestingT = t
+
+	if o.Format == "junit" {
+		output, err := os.OpenFile("junit.xml", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer output.Close()
+		o.Output = output
+	}
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,
