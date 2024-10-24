@@ -28,4 +28,4 @@ Feature: Object
       end
       Hello.new.inspect
       """
-    Then there should return string "Hello"
+    Then there should return string like "#<Hello:0x[0-9a-f]+>"

@@ -13,9 +13,6 @@ func (mrb *State) Inspect(obj Value) string {
 
 func objectInspect(mrb *State, self Value) Value {
 	switch v := self.(type) {
-	case *Object:
-		name := mrb.ObjectInstanceVariableGet(v.Class(), _classname(mrb))
-		return name
 	case RClass:
 		name := mrb.ObjectInstanceVariableGet(v, _classname(mrb))
 		return name
@@ -24,7 +21,7 @@ func objectInspect(mrb *State, self Value) Value {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("%d", v)
 	default:
-		return nil
+		return anyToString(mrb, self)
 	}
 }
 

@@ -1,5 +1,7 @@
 package mruby
 
+import "fmt"
+
 type RBasic interface {
 	Class() RClass
 	Flags() uint32
@@ -42,6 +44,11 @@ func (obj *Object) ivGet(sym Symbol) Value {
 	}
 
 	return obj.iv.Get(sym)
+}
+
+func anyToString(mrb *State, obj Value) Value {
+	className := mrb.ObjectClassName(obj)
+	return fmt.Sprintf("#<%s:%p>", className, obj)
 }
 
 func initObject(mrb *State) (err error) {

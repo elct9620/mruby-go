@@ -78,6 +78,10 @@ func (mrb *State) DefineClassId(name Symbol, super RClass) (RClass, error) {
 	return mrb.defineClass(name, super, mrb.ObjectClass)
 }
 
+func (mrb *State) ObjectClassName(obj Value) string {
+	return mrb.ClassName(mrb.Class(obj))
+}
+
 func (mrb *State) ClassName(class RClass) string {
 	if class == nil {
 		return ""

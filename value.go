@@ -19,6 +19,15 @@ func Test(v Value) bool {
 	return Bool(v)
 }
 
+func ObjectP(v Value) bool {
+	switch v.(type) {
+	case *Object:
+		return true
+	default:
+		return false
+	}
+}
+
 func ClassP(v Value) bool {
 	switch v.(type) {
 	case *Class:

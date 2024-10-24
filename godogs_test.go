@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -93,6 +94,24 @@ func (feat *RubyFeature) thereShouldReturnString(expected string) error {
 	}
 
 	if !cmp.Equal(actual, expected) {
+		return fmt.Errorf("string not matched %s", cmp.Diff(actual, expected))
+	}
+
+	return nil
+}
+
+func (feat *RubyFeature) thereShouldReturnStringLike(expected string) error {
+	actual, ok := feat.ret.(string)
+	if !ok {
+		return fmt.Errorf("expected string, got %T (%+v)", feat.ret, feat.ret)
+	}
+
+	expr, err := regexp.Compile(expected)
+	if err != nil {
+		return err
+	}
+
+	if !expr.MatchString(actual) {
 		return fmt.Errorf("string not matched %s", cmp.Diff(actual, expected))
 	}
 
@@ -213,6 +232,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^there should return false$`, feat.thereShouldReturnFalse)
 	s.Step(`^there should return nil$`, feat.thereShouldReturnNil)
 	s.Step(`^there should return string "([^"]*)"$`, feat.thereShouldReturnString)
+	s.Step(`^there should return string like "([^"]*)"$`, feat.thereShouldReturnStringLike)
 	s.Step(`^there should return symbol "([^"]*)"$`, feat.thereShouldReturnSymbol)
 	s.Step(`^there should return object$`, feat.thereShouldReturnObject)
 	s.Step(`^there should return class "([^"]*)"$`, feat.thereShouldReturnClass)
