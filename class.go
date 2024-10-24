@@ -48,6 +48,15 @@ type InheritClass struct {
 	class
 }
 
+func ClassPointerP(v Value) bool {
+	switch v.(type) {
+	case *Class, *SingletonClass, *Module:
+		return true
+	default:
+		return false
+	}
+}
+
 func (mrb *State) Class(v Value) RClass {
 	switch v := v.(type) {
 	case RObject:
@@ -119,6 +128,12 @@ func (mrb *State) VmFindMethod(recv Value, class RClass, mid Symbol) Method {
 	return nil
 }
 
+func (mrb *State) checkIfClassOrModule(object Value) {
+	if !ClassPointerP(object) {
+		mrb.Raisef(nil, "%v is not a class/module", object)
+	}
+}
+
 func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (RClass, error) {
 	var superClass RClass
 	if super != nil {
@@ -129,9 +144,7 @@ func (mrb *State) vmDefineClass(outer Value, super Value, id Symbol) (RClass, er
 		}
 	}
 
-	if !ClassPointerP(outer) {
-		mrb.Raisef(nil, "outer is not a class or module")
-	}
+	mrb.checkIfClassOrModule(outer)
 	outerModule := outer.(RClass)
 
 	return mrb.defineClass(id, superClass, outerModule)

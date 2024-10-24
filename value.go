@@ -27,16 +27,3 @@ func ClassP(v Value) bool {
 		return false
 	}
 }
-
-func ClassPointerP(v Value) bool {
-	switch v.(type) {
-	case *Class:
-		return true
-	case *SingletonClass:
-		return true
-	case *Module:
-		return true
-	default:
-		return false
-	}
-}
